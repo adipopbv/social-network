@@ -7,12 +7,12 @@ import socialnetwork.repository.Repository;
 import java.util.HashMap;
 import java.util.Map;
 
-public class InMemoryRepository<ID, E extends Entity<ID>> implements Repository<ID,E> {
+public class MemoryRepository<ID, E extends Entity<ID>> implements Repository<ID,E> {
 
     private Validator<E> validator;
     Map<ID,E> entities;
 
-    public InMemoryRepository(Validator<E> validator) {
+    public MemoryRepository(Validator<E> validator) {
         this.validator = validator;
         entities=new HashMap<ID,E>();
     }
