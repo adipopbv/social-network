@@ -28,4 +28,8 @@ public class UserService {
     public Iterable<User> getAll(){
         return repo.findAll();
     }
+
+    public User removeUser(long id) {
+        return repo.delete(id);
+    }
 }

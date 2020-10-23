@@ -9,8 +9,6 @@ import java.nio.file.*;
 import java.util.Arrays;
 import java.util.List;
 
-
-///Aceasta clasa implementeaza sablonul de proiectare Template Method; puteti inlucui solutia propusa cu un Factori (vezi mai jos)
 public abstract class AbstractFileRepository<ID, E extends Entity<ID>> extends MemoryRepository<ID,E> {
     protected String fileName;
 
@@ -46,10 +44,30 @@ public abstract class AbstractFileRepository<ID, E extends Entity<ID>> extends M
         return e;
     }
 
+    @Override
+    public E delete(ID id) {
+        E e = super.delete(id);
+        if (e != null)
+            rewriteToFile();
+        return e;
+    }
+
     protected void writeToFile(E entity){
         try (BufferedWriter bW = new BufferedWriter(new FileWriter(fileName,true))) {
             bW.write(createEntityAsString(entity));
             bW.newLine();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void rewriteToFile(){
+        try (BufferedWriter bW = new BufferedWriter(new FileWriter(fileName))) {
+            for (E entity : entities.values()) {
+                bW.write(createEntityAsString(entity));
+                bW.newLine();
+            }
         }
         catch (IOException e) {
             e.printStackTrace();

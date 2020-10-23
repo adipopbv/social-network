@@ -35,10 +35,11 @@ public class User extends Entity<Long>{
 
     @Override
     public String toString() {
-        return "Utilizator{" +
-                "firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", friends=" + friends +
+        return "User{" +
+                "id='" + getId() + '\'' +
+                ", firstName='" + getFirstName() + '\'' +
+                ", lastName='" + getLastName() + '\'' +
+                ", friends=" + getFriends() +
                 '}';
     }
 
