@@ -1,6 +1,7 @@
 package socialnetwork.repository.memory;
 
 import socialnetwork.domain.Entity;
+import socialnetwork.domain.exceptions.NotFoundException;
 import socialnetwork.domain.validators.Validator;
 import socialnetwork.repository.Repository;
 
@@ -43,7 +44,11 @@ public class MemoryRepository<ID, E extends Entity<ID>> implements Repository<ID
 
     @Override
     public E delete(ID id) {
-        return null;
+        if (id == null)
+            throw new IllegalArgumentException("id must not be null");
+        if (entities.get(id) == null)
+            throw new NotFoundException("entity not found in repo");
+        return entities.remove(id);
     }
 
     @Override

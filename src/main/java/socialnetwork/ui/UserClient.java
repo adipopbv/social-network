@@ -65,6 +65,9 @@ public class UserClient {
     }
 
     private void removeUser() {
-
+        System.out.print("id: ");
+        String idStr = scanner.nextLine();
+        long id = Long.parseLong(idStr);
+        userService.removeUser(id);
     }
 }
