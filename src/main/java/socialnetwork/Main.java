@@ -1,19 +1,19 @@
 package socialnetwork;
 
-import socialnetwork.config.ApplicationContext;
-import socialnetwork.domain.Utilizator;
-import socialnetwork.domain.validators.UtilizatorValidator;
+import socialnetwork.domain.User;
+import socialnetwork.domain.validators.UserValidator;
 import socialnetwork.repository.Repository;
-import socialnetwork.repository.file.UtilizatorFile;
+import socialnetwork.repository.file.UserFileRepository;
+import socialnetwork.service.UserService;
+import socialnetwork.ui.UserClient;
 
 public class Main {
     public static void main(String[] args) {
-        String fileName="data/users.csv";
-        Repository<Long,Utilizator> userFileRepository = new UtilizatorFile(fileName
-                , new UtilizatorValidator());
+        Repository<Long, User> userRepository = new UserFileRepository("data/users.csv", new UserValidator());
+        UserService userService = new UserService(userRepository);
+        UserClient userClient = new UserClient(userService);
 
-        userFileRepository.findAll().forEach(System.out::println);
-
+        userClient.run();
     }
 }
 

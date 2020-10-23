@@ -3,11 +3,11 @@ package socialnetwork.domain;
 import java.time.LocalDateTime;
 
 
-public class Prietenie extends Entity<Tuple<Long,Long>> {
+public class Friendship extends Entity<Tuple<Long,Long>> {
 
     LocalDateTime date;
 
-    public Prietenie() {
+    public Friendship() {
     }
 
     /**
