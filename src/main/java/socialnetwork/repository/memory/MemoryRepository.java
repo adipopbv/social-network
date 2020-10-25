@@ -64,4 +64,9 @@ public class MemoryRepository<ID, E extends Entity<ID>> implements Repository<ID
         }
         return entity;
     }
+
+    @Override
+    public void close() {
+
+    }
 }

@@ -65,5 +65,6 @@ public interface Repository<ID, E extends Entity<ID>> {
      */
     E update(E entity);
 
+    void close();
 }
 
