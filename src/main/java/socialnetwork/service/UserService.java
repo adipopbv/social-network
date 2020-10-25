@@ -25,11 +25,23 @@ public class UserService {
         return user;
     }
 
-    public Iterable<User> getAll(){
-        return repo.findAll();
+    public User addFriend(long id1, long id2) {
+        User user = repo.findOne(id1);
+        user.getFriends().add(repo.findOne(id2));
+        return user;
+    }
+
+    public User removeFriend(long id1, long id2) {
+        User user = repo.findOne(id1);
+        user.getFriends().remove(repo.findOne(id2));
+        return user;
     }
 
     public User removeUser(long id) {
         return repo.delete(id);
+    }
+
+    public Iterable<User> getAll(){
+        return repo.findAll();
     }
 }
