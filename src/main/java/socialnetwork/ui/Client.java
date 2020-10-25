@@ -1,19 +1,16 @@
 package socialnetwork.ui;
 
 import socialnetwork.domain.Friendship;
-import socialnetwork.service.FriendshipService;
-import socialnetwork.service.UserService;
+import socialnetwork.service.Service;
 
 import java.util.Scanner;
 
 public class Client {
-    private final UserService userService;
-    private final FriendshipService friendshipService;
+    private final Service service;
     private final Scanner scanner = new Scanner(System.in);
 
-    public Client(UserService userService, FriendshipService friendshipService) {
-        this.userService = userService;
-        this.friendshipService = friendshipService;
+    public Client(Service service) {
+        this.service = service;
     }
 
     public void run() {
@@ -25,6 +22,7 @@ public class Client {
                 switch (option) {
                     case "0":
                         System.out.println("\nExiting app...");
+                        service.close();
                         return;
                     case "1":
                         showAllUsers();
@@ -69,11 +67,11 @@ public class Client {
     }
 
     private void showAllUsers() {
-        userService.getAll().forEach(System.out::println);
+        service.getAllUsers().forEach(System.out::println);
     }
 
     private void showAllFriendships() {
-        friendshipService.getAll().forEach(System.out::println);
+        service.getAllFriendships().forEach(System.out::println);
     }
 
     private void addUser() {
@@ -82,15 +80,14 @@ public class Client {
         System.out.print("Last name: ");
         String lastName = scanner.nextLine();
 
-        userService.addUser(firstName, lastName);
+        service.addUser(firstName, lastName);
     }
 
     private void removeUser() {
         System.out.print("User id: ");
         String id = scanner.nextLine();
 
-        userService.removeUser(Long.parseLong(id));
-        friendshipService.removeFriendships(Long.parseLong(id));
+        service.removeUser(Long.parseLong(id));
     }
 
     private void addFriendship() {
@@ -99,17 +96,13 @@ public class Client {
         System.out.print("Friend 2 id: ");
         String id2 = scanner.nextLine();
 
-        friendshipService.addFriendship(Long.parseLong(id1), Long.parseLong(id2));
-        userService.addFriend(Long.parseLong(id1), Long.parseLong(id2));
-        userService.addFriend(Long.parseLong(id2), Long.parseLong(id1));
+        service.addFriendship(Long.parseLong(id1), Long.parseLong(id2));
     }
 
     private void removeFriendship() {
         System.out.print("Friendship id: ");
         String id = scanner.nextLine();
 
-        Friendship friendship = friendshipService.removeFriendship(Long.parseLong(id));
-        userService.removeFriend(friendship.getFriend1(), friendship.getFriend2());
-        userService.removeFriend(friendship.getFriend2(), friendship.getFriend1());
+        service.removeFriendship(Long.parseLong(id));
     }
 }
