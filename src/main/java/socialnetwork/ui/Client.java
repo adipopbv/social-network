@@ -1,6 +1,7 @@
 package socialnetwork.ui;
 
 import socialnetwork.domain.Friendship;
+import socialnetwork.domain.exceptions.SocialNetworkException;
 import socialnetwork.service.Service;
 
 import java.util.Scanner;
@@ -47,8 +48,8 @@ public class Client {
                         break;
                 }
             }
-            catch (RuntimeException exception) {
-                System.out.println("\nError: " + exception);
+            catch (SocialNetworkException exception) {
+                System.out.println(exception.toString());
             }
         }
     }
@@ -95,6 +96,13 @@ public class Client {
         String id1 = scanner.nextLine();
         System.out.print("Friend 2 id: ");
         String id2 = scanner.nextLine();
+        try {
+            Long.parseLong(id1);
+            Long.parseLong(id2);
+        }
+        catch (Exception e) {
+            id1 = id2 = "-1";
+        }
 
         service.addFriendship(Long.parseLong(id1), Long.parseLong(id2));
     }
@@ -102,6 +110,12 @@ public class Client {
     private void removeFriendship() {
         System.out.print("Friendship id: ");
         String id = scanner.nextLine();
+        try {
+            Long.parseLong(id);
+        }
+        catch (Exception e) {
+            id = "-1";
+        }
 
         service.removeFriendship(Long.parseLong(id));
     }
