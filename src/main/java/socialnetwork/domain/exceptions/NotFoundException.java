@@ -1,7 +1,8 @@
 package socialnetwork.domain.exceptions;
 
-public class NotFoundException extends RuntimeException {
+public class NotFoundException extends SocialNetworkException {
     public NotFoundException() {
+        super("element not found");
     }
 
     public NotFoundException(String message) {

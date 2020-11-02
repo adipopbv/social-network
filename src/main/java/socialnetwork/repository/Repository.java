@@ -1,7 +1,7 @@
 package socialnetwork.repository;
 
 import socialnetwork.domain.Entity;
-import socialnetwork.domain.validators.ValidationException;
+import socialnetwork.domain.exceptions.ValidationException;
 
 /**
  * CRUD operations repository interface
