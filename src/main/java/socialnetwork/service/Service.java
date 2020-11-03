@@ -1,13 +1,13 @@
 package socialnetwork.service;
 
 import socialnetwork.domain.Friendship;
+import socialnetwork.domain.graphs.UndirectedGraph;
 import socialnetwork.domain.User;
 import socialnetwork.domain.validators.FriendshipValidator;
 import socialnetwork.domain.validators.UserValidator;
 import socialnetwork.repository.Repository;
 
-import javax.swing.*;
-import java.util.Random;
+import java.util.*;
 
 public class Service {
     private final Repository<Long, User> userRepository;
@@ -22,11 +22,11 @@ public class Service {
         friendshipValidator = new FriendshipValidator();
     }
 
-    public Iterable<User> getAllUsers(){
+    public Iterable<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    public Iterable<Friendship> getAllFriendships(){
+    public Iterable<Friendship> getAllFriendships() {
         return friendshipRepository.findAll();
     }
 
@@ -75,6 +75,23 @@ public class Service {
         user2.getFriends().remove(user1.getId());
 
         return friendship;
+    }
+
+    public int getCommunitiesCount() {
+        Map<Long, HashSet<Long>> adjMap = new HashMap<>();
+        for (User user : getAllUsers()) {
+            for (long friendId : user.getFriends()) {
+                long userId = user.getId();
+                adjMap.putIfAbsent(userId, new HashSet<>());
+                adjMap.putIfAbsent(friendId, new HashSet<>());
+                adjMap.get(userId).add(friendId);
+                adjMap.get(userId).add(userId);
+                adjMap.get(friendId).add(userId);
+                adjMap.get(friendId).add(friendId);
+            }
+        }
+        UndirectedGraph graph = new UndirectedGraph(adjMap);
+        return graph.getConnectedComponentsCount();
     }
 
     public void close() {
