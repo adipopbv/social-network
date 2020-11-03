@@ -1,6 +1,5 @@
 package socialnetwork.ui;
 
-import socialnetwork.domain.Friendship;
 import socialnetwork.domain.exceptions.SocialNetworkException;
 import socialnetwork.service.Service;
 
@@ -43,6 +42,9 @@ public class Client {
                     case "6":
                         removeFriendship();
                         break;
+                    case "7":
+                        getCommunitiesCount();
+                        break;
                     default:
                         System.out.println("\ncommand not recognised!");
                         break;
@@ -64,6 +66,7 @@ public class Client {
         System.out.println("    [4]: Remove user");
         System.out.println("    [5]: Add friendship");
         System.out.println("    [6]: Remove friendship");
+        System.out.println("    [7]: Communities count");
         System.out.println("----------------------");
     }
 
@@ -118,5 +121,9 @@ public class Client {
         }
 
         service.removeFriendship(Long.parseLong(id));
+    }
+
+    private void getCommunitiesCount() {
+        System.out.println("Communities count: " + service.getCommunitiesCount());
     }
 }
