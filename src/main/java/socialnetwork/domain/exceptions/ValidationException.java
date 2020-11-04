@@ -1,7 +1,8 @@
-package socialnetwork.domain.validators;
+package socialnetwork.domain.exceptions;
 
-public class ValidationException extends RuntimeException {
+public class ValidationException extends SocialNetworkException {
     public ValidationException() {
+        super("invalid data");
     }
 
     public ValidationException(String message) {

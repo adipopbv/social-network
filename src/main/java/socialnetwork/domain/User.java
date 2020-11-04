@@ -2,15 +2,23 @@ package socialnetwork.domain;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Vector;
 
 public class User extends Entity<Long>{
     private String firstName;
     private String lastName;
-    private List<User> friends;
+    private final List<Long> friends;
 
     public User(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
+        friends = new Vector<>();
+    }
+
+    public User(String firstName, String lastName, List<Long> friends) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.friends = friends;
     }
 
     public String getFirstName() {
@@ -29,7 +37,7 @@ public class User extends Entity<Long>{
         this.lastName = lastName;
     }
 
-    public List<User> getFriends() {
+    public List<Long> getFriends() {
         return friends;
     }
 

@@ -62,7 +62,7 @@ public abstract class AbstractFileRepository<ID, E extends Entity<ID>> extends M
         }
     }
 
-    protected void rewriteToFile(){
+    public void rewriteToFile(){
         try (BufferedWriter bW = new BufferedWriter(new FileWriter(fileName))) {
             for (E entity : entities.values()) {
                 bW.write(createEntityAsString(entity));
@@ -72,6 +72,11 @@ public abstract class AbstractFileRepository<ID, E extends Entity<ID>> extends M
         catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void close() {
+        rewriteToFile();
     }
 }
 
