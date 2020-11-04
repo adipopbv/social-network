@@ -7,6 +7,7 @@ import socialnetwork.domain.validators.FriendshipValidator;
 import socialnetwork.domain.validators.UserValidator;
 import socialnetwork.repository.Repository;
 
+import java.text.CollationElementIterator;
 import java.util.*;
 
 public class Service {
@@ -97,5 +98,27 @@ public class Service {
     public void close() {
         userRepository.close();
         friendshipRepository.close();
+    }
+
+    public Iterable<User> getMostSociableCommunity() {
+        Map<Long, HashSet<Long>> adjMap = new HashMap<>();
+        for (User user : getAllUsers()) {
+            for (long friendId : user.getFriends()) {
+                long userId = user.getId();
+                adjMap.putIfAbsent(userId, new HashSet<>());
+                adjMap.putIfAbsent(friendId, new HashSet<>());
+                adjMap.get(userId).add(friendId);
+                adjMap.get(userId).add(userId);
+                adjMap.get(friendId).add(userId);
+                adjMap.get(friendId).add(friendId);
+            }
+        }
+        UndirectedGraph graph = new UndirectedGraph(adjMap);
+        Collection<User> mostSociableNetwork = new ArrayList<>();
+        Iterable<Long> connectedComponent = graph.getConnectedComponentWithLongestRoad();
+        for (long vertex : connectedComponent) {
+            mostSociableNetwork.add(userRepository.findOne(vertex));
+        }
+        return mostSociableNetwork;
     }
 }
