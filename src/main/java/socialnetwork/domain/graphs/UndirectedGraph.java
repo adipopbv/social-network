@@ -16,23 +16,60 @@ public class UndirectedGraph {
         }
     }
 
-    private void findNextVertex(Long vertex) {
+    private void resetVisited() {
+        visited.replaceAll((k, v) -> false);
+    }
+
+    private int visitNextVertex(Long vertex) {
+        int maxPathLength = 0;
         visited.put(vertex, true);
         for (long adjVertex : adjMap.get(vertex)) {
             if (!visited.get(adjVertex)) {
-                findNextVertex(adjVertex);
+                int pathLenght = visitNextVertex(adjVertex);
+                maxPathLength = Math.max(maxPathLength, pathLenght);
             }
         }
+        return maxPathLength + 1;
     }
 
     public int getConnectedComponentsCount() {
         int count = 0;
+        resetVisited();
         for (long vertex : visited.keySet()) {
             if (!visited.get(vertex)) {
-                findNextVertex(vertex);
+                visitNextVertex(vertex);
                 count++;
             }
         }
         return count;
+    }
+
+    private void makeSubgraph(long vertex, Collection<Long> connectedComponent) {
+        connectedComponent.add(vertex);
+        visited.put(vertex, true);
+        for (long adjVertex : adjMap.get(vertex)) {
+            if (!visited.get(adjVertex)) {
+                makeSubgraph(adjVertex, connectedComponent);
+            }
+        }
+    }
+
+    public Iterable<Long> getConnectedComponentWithLongestRoad() {
+        resetVisited();
+        int maxPathLength = 0;
+        long startVertex = -1;
+        for (long vertex : visited.keySet()) {
+            if (!visited.get(vertex)) {
+                int pathLenght = visitNextVertex(vertex);
+                if (maxPathLength < pathLenght) {
+                    maxPathLength = pathLenght;
+                    startVertex = vertex;
+                }
+            }
+        }
+        Collection<Long> connectedComponent = new ArrayList<>();
+        resetVisited();
+        makeSubgraph(startVertex, connectedComponent);
+        return connectedComponent;
     }
 }

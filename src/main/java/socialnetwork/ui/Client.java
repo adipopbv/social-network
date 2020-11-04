@@ -1,5 +1,6 @@
 package socialnetwork.ui;
 
+import org.w3c.dom.ls.LSOutput;
 import socialnetwork.domain.exceptions.SocialNetworkException;
 import socialnetwork.service.Service;
 
@@ -45,6 +46,9 @@ public class Client {
                     case "7":
                         getCommunitiesCount();
                         break;
+                    case "8":
+                        getMostSociableCommunity();
+                        break;
                     default:
                         System.out.println("\ncommand not recognised!");
                         break;
@@ -67,6 +71,7 @@ public class Client {
         System.out.println("    [5]: Add friendship");
         System.out.println("    [6]: Remove friendship");
         System.out.println("    [7]: Communities count");
+        System.out.println("    [8]: Most sociable community");
         System.out.println("----------------------");
     }
 
@@ -125,5 +130,9 @@ public class Client {
 
     private void getCommunitiesCount() {
         System.out.println("Communities count: " + service.getCommunitiesCount());
+    }
+
+    private void getMostSociableCommunity() {
+        service.getMostSociableCommunity().forEach(System.out::println);
     }
 }
