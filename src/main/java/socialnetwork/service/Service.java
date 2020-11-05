@@ -44,9 +44,13 @@ public class Service {
     public User removeUser(long id) {
         User user = userRepository.delete(id);
 
+        Collection<Friendship> toBeErased = new ArrayList<>();
         for (Friendship friendship : friendshipRepository.findAll())
             if (user.getId() == friendship.getFriend1() || user.getId() == friendship.getFriend2())
-                friendshipRepository.delete(friendship.getId());
+                toBeErased.add(friendship);
+        // faceam delete la friendship din lista din care faceam foreach loop in timpul iterarii
+        for (Friendship friendship : toBeErased)
+            friendshipRepository.delete(friendship.getId());
         for (User userSearch : userRepository.findAll())
             userSearch.getFriends().remove(id);
 
