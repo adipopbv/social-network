@@ -9,6 +9,7 @@ import socialnetwork.repository.Repository;
 
 import java.text.CollationElementIterator;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Service {
     private final Repository<Long, User> userRepository;
@@ -124,5 +125,16 @@ public class Service {
             mostSociableNetwork.add(userRepository.findOne(vertex));
         }
         return mostSociableNetwork;
+    }
+
+    public Collection<Friendship> getUserFriendships(long id) {
+        Collection<Friendship> friendships = new ArrayList<>();
+        for (Friendship friendship : friendshipRepository.findAll()) {
+            friendships.add(friendship);
+        }
+        friendships = friendships.stream()
+                .filter(fr -> fr.getFriend1() == id || fr.getFriend2() == id)
+                .collect(Collectors.toCollection(ArrayList::new));
+        return friendships;
     }
 }
