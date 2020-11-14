@@ -1,9 +1,15 @@
 package socialnetwork.ui;
 
-import org.w3c.dom.ls.LSOutput;
+import socialnetwork.domain.Friendship;
+import socialnetwork.domain.User;
 import socialnetwork.domain.exceptions.SocialNetworkException;
 import socialnetwork.service.Service;
 
+import java.sql.SQLOutput;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Client {
@@ -49,12 +55,14 @@ public class Client {
                     case "8":
                         getMostSociableCommunity();
                         break;
+                    case "9":
+                        getUserFriendships();
+                        break;
                     default:
                         System.out.println("\ncommand not recognised!");
                         break;
                 }
-            }
-            catch (SocialNetworkException exception) {
+            } catch (SocialNetworkException exception) {
                 System.out.println(exception.toString());
             }
         }
@@ -72,6 +80,7 @@ public class Client {
         System.out.println("    [6]: Remove friendship");
         System.out.println("    [7]: Communities count");
         System.out.println("    [8]: Most sociable community");
+        System.out.println("    [9]: User friendships");
         System.out.println("----------------------");
     }
 
@@ -107,8 +116,7 @@ public class Client {
         try {
             Long.parseLong(id1);
             Long.parseLong(id2);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             id1 = id2 = "-1";
         }
 
@@ -120,8 +128,7 @@ public class Client {
         String id = scanner.nextLine();
         try {
             Long.parseLong(id);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             id = "-1";
         }
 
@@ -134,5 +141,15 @@ public class Client {
 
     private void getMostSociableCommunity() {
         service.getMostSociableCommunity().forEach(System.out::println);
+    }
+
+    private void getUserFriendships() {
+        System.out.print("User id: ");
+        String id = scanner.nextLine();
+
+        Map<User, LocalDateTime> friends = service.getUserFriendships(Long.parseLong(id));
+        for (User user : friends.keySet()) {
+            System.out.println(user.getLastName() + "|" + user.getFirstName() + "|" + friends.get(user));
+        }
     }
 }

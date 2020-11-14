@@ -8,7 +8,10 @@ import socialnetwork.domain.validators.UserValidator;
 import socialnetwork.repository.Repository;
 
 import java.text.CollationElementIterator;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Service {
     private final Repository<Long, User> userRepository;
@@ -124,5 +127,23 @@ public class Service {
             mostSociableNetwork.add(userRepository.findOne(vertex));
         }
         return mostSociableNetwork;
+    }
+
+    public Map<User, LocalDateTime> getUserFriendships(long id) {
+        Map<User, LocalDateTime> friends = new HashMap<>();
+        Collection<Friendship> friendships = new ArrayList<>();
+        for (Friendship friendship : friendshipRepository.findAll()) {
+            friendships.add(friendship);
+        }
+
+        friendships = friendships.stream()
+                .filter(fr -> fr.getFriend1() == id || fr.getFriend2() == id)
+                .collect(Collectors.toCollection(ArrayList::new));
+        friendships.forEach(friendship -> {
+            long friendId = (id == friendship.getFriend1()) ? friendship.getFriend2() : friendship.getFriend1();
+            friends.put(userRepository.findOne(friendId), friendship.getDate());
+        });
+
+        return friends;
     }
 }
