@@ -1,10 +1,15 @@
 package socialnetwork.ui;
 
 import socialnetwork.domain.Friendship;
+import socialnetwork.domain.User;
 import socialnetwork.domain.exceptions.SocialNetworkException;
 import socialnetwork.service.Service;
 
+import java.sql.SQLOutput;
+import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Date;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Client {
@@ -142,9 +147,9 @@ public class Client {
         System.out.print("User id: ");
         String id = scanner.nextLine();
 
-        Collection<Friendship> friendships = service.getUserFriendships(Long.parseLong(id));
-        friendships.forEach(friendship -> {
-            System.out.println(friendship.getFriend1() + "|" + friendship.getFriend2() + "|" + friendship.getDate());
-        });
+        Map<User, LocalDateTime> friends = service.getUserFriendships(Long.parseLong(id));
+        for (User user : friends.keySet()) {
+            System.out.println(user.getLastName() + "|" + user.getFirstName() + "|" + friends.get(user));
+        }
     }
 }
