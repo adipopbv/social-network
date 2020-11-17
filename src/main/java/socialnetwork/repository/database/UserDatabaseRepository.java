@@ -5,7 +5,6 @@ import socialnetwork.domain.exceptions.DatabaseException;
 import socialnetwork.domain.validators.Validator;
 
 import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;

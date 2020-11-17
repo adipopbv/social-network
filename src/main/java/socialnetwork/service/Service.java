@@ -7,8 +7,6 @@ import socialnetwork.domain.validators.FriendshipValidator;
 import socialnetwork.domain.validators.UserValidator;
 import socialnetwork.repository.Repository;
 
-import java.text.CollationElementIterator;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
