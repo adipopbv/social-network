@@ -1,14 +1,10 @@
 package socialnetwork.ui;
 
-import socialnetwork.domain.Friendship;
 import socialnetwork.domain.User;
 import socialnetwork.domain.exceptions.SocialNetworkException;
 import socialnetwork.service.Service;
 
-import java.sql.SQLOutput;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Date;
 import java.util.Map;
 import java.util.Scanner;
 
