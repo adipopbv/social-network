@@ -1,9 +1,11 @@
 package socialnetwork.service;
 
 import socialnetwork.domain.Friendship;
+import socialnetwork.domain.Message;
 import socialnetwork.domain.graphs.UndirectedGraph;
 import socialnetwork.domain.User;
 import socialnetwork.domain.validators.FriendshipValidator;
+import socialnetwork.domain.validators.MessageValidator;
 import socialnetwork.domain.validators.UserValidator;
 import socialnetwork.repository.Repository;
 
@@ -14,14 +16,18 @@ import java.util.stream.Collectors;
 public class Service {
     private final Repository<Long, User> userRepository;
     private final Repository<Long, Friendship> friendshipRepository;
+    private final Repository<Long, Message> messageRepository;
     private final UserValidator userValidator;
     private final FriendshipValidator friendshipValidator;
+    private final MessageValidator messageValidator;
 
-    public Service(Repository<Long, User> userRepository, Repository<Long, Friendship> friendshipRepository) {
+    public Service(Repository<Long, User> userRepository, Repository<Long, Friendship> friendshipRepository, Repository<Long, Message> messageRepository) {
         this.userRepository = userRepository;
         this.friendshipRepository = friendshipRepository;
+        this.messageRepository = messageRepository;
         userValidator = new UserValidator();
         friendshipValidator = new FriendshipValidator();
+        messageValidator = new MessageValidator();
     }
 
     public Iterable<User> getAllUsers() {
@@ -30,6 +36,10 @@ public class Service {
 
     public Iterable<Friendship> getAllFriendships() {
         return friendshipRepository.findAll();
+    }
+
+    public Iterable<Message> getAllMessages() {
+        return messageRepository.findAll();
     }
 
     public User addUser(String firstName, String lastName) {

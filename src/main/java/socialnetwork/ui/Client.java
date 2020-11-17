@@ -31,13 +31,13 @@ public class Client {
                         showAllUsers();
                         break;
                     case "2":
-                        showAllFriendships();
-                        break;
-                    case "3":
                         addUser();
                         break;
-                    case "4":
+                    case "3":
                         removeUser();
+                        break;
+                    case "4":
+                        showAllFriendships();
                         break;
                     case "5":
                         addFriendship();
@@ -57,6 +57,18 @@ public class Client {
                     case "10":
                         getUserFriendshipsInMonth();
                         break;
+                    case "11":
+                        sendMessage();
+                        break;
+                    case "12":
+                        listConversations();
+                        break;
+                    case "13":
+                        viewConversation();
+                        break;
+                    case "14":
+                        replyToMessage();
+                        break;
                     default:
                         System.out.println("\ncommand not recognised!");
                         break;
@@ -71,16 +83,25 @@ public class Client {
         System.out.println("\n--- Social Network ---");
         System.out.println("Commands:");
         System.out.println("    [0]: Exit");
+        System.out.println("--Users---------------");
         System.out.println("    [1]: Show all users");
-        System.out.println("    [2]: Show all friendships");
-        System.out.println("    [3]: Add user");
-        System.out.println("    [4]: Remove user");
+        System.out.println("    [2]: Add user");
+        System.out.println("    [3]: Remove user");
+        System.out.println("--Friendships---------");
+        System.out.println("    [4]: Show all friendships");
         System.out.println("    [5]: Add friendship");
         System.out.println("    [6]: Remove friendship");
+        System.out.println("--Communities---------");
         System.out.println("    [7]: Communities count");
         System.out.println("    [8]: Most sociable community");
+        System.out.println("--Friends-------------");
         System.out.println("    [9]: User friendships");
         System.out.println("    [10]: User friendships in month");
+        System.out.println("--Messages------------");
+        System.out.println("    [11]: Send message");
+        System.out.println("    [12]: List conversations");
+        System.out.println("    [13]: View conversation");
+        System.out.println("    [14]: Reply to message");
         System.out.println("----------------------");
     }
 
@@ -163,5 +184,21 @@ public class Client {
         for (User user : friends.keySet()) {
             System.out.println(user.getLastName() + "|" + user.getFirstName() + "|" + friends.get(user));
         }
+    }
+
+    private void sendMessage() {
+
+    }
+
+    private void listConversations() {
+
+    }
+
+    private void viewConversation() {
+
+    }
+
+    private void replyToMessage() {
+
     }
 }
