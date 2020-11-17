@@ -144,4 +144,22 @@ public class Service {
 
         return friends;
     }
+
+    public Map<User, LocalDateTime> getUserFriendshipsInMonth(long id, int month) {
+        Map<User, LocalDateTime> friends = new HashMap<>();
+        Collection<Friendship> friendships = new ArrayList<>();
+        for (Friendship friendship : friendshipRepository.findAll()) {
+            friendships.add(friendship);
+        }
+
+        friendships = friendships.stream()
+                .filter(fr -> (fr.getFriend1() == id || fr.getFriend2() == id) && fr.getDate().getMonth().getValue() == month)
+                .collect(Collectors.toCollection(ArrayList::new));
+        friendships.forEach(friendship -> {
+            long friendId = (id == friendship.getFriend1()) ? friendship.getFriend2() : friendship.getFriend1();
+            friends.put(userRepository.findOne(friendId), friendship.getDate());
+        });
+
+        return friends;
+    }
 }
