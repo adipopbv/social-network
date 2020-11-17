@@ -54,6 +54,9 @@ public class Client {
                     case "9":
                         getUserFriendships();
                         break;
+                    case "10":
+                        getUserFriendshipsInMonth();
+                        break;
                     default:
                         System.out.println("\ncommand not recognised!");
                         break;
@@ -77,6 +80,7 @@ public class Client {
         System.out.println("    [7]: Communities count");
         System.out.println("    [8]: Most sociable community");
         System.out.println("    [9]: User friendships");
+        System.out.println("    [10]: User friendships in month");
         System.out.println("----------------------");
     }
 
@@ -144,6 +148,18 @@ public class Client {
         String id = scanner.nextLine();
 
         Map<User, LocalDateTime> friends = service.getUserFriendships(Long.parseLong(id));
+        for (User user : friends.keySet()) {
+            System.out.println(user.getLastName() + "|" + user.getFirstName() + "|" + friends.get(user));
+        }
+    }
+
+    private void getUserFriendshipsInMonth() {
+        System.out.print("User id: ");
+        String id = scanner.nextLine();
+        System.out.print("Month of friendship: ");
+        String month = scanner.nextLine();
+
+        Map<User, LocalDateTime> friends = service.getUserFriendshipsInMonth(Long.parseLong(id), Integer.parseInt(month));
         for (User user : friends.keySet()) {
             System.out.println(user.getLastName() + "|" + user.getFirstName() + "|" + friends.get(user));
         }
