@@ -9,8 +9,8 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 public class FriendshipDatabaseRepository extends AbstractDatabaseRepository<Long, Friendship>  {
-    public FriendshipDatabaseRepository(String url, String user, String password, Validator<Friendship> validator) {
-        super(url, user, password, validator);
+    public FriendshipDatabaseRepository(String url, String user, String password) {
+        super(url, user, password);
     }
 
     @Override

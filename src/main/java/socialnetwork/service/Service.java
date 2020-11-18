@@ -1,12 +1,11 @@
 package socialnetwork.service;
 
-import socialnetwork.domain.Friendship;
-import socialnetwork.domain.Message;
+import socialnetwork.domain.*;
 import socialnetwork.domain.exceptions.NotFoundException;
 import socialnetwork.domain.exceptions.ValidationException;
 import socialnetwork.domain.graphs.UndirectedGraph;
-import socialnetwork.domain.User;
 import socialnetwork.domain.validators.FriendshipValidator;
+import socialnetwork.domain.validators.InviteValidator;
 import socialnetwork.domain.validators.MessageValidator;
 import socialnetwork.domain.validators.UserValidator;
 import socialnetwork.repository.Repository;
@@ -19,17 +18,21 @@ public class Service {
     private final Repository<Long, User> userRepository;
     private final Repository<Long, Friendship> friendshipRepository;
     private final Repository<Long, Message> messageRepository;
+    private final Repository<Long, Invite> inviteRepository;
     private final UserValidator userValidator;
     private final FriendshipValidator friendshipValidator;
     private final MessageValidator messageValidator;
+    private final InviteValidator inviteValidator;
 
-    public Service(Repository<Long, User> userRepository, Repository<Long, Friendship> friendshipRepository, Repository<Long, Message> messageRepository) {
+    public Service(Repository<Long, User> userRepository, Repository<Long, Friendship> friendshipRepository, Repository<Long, Message> messageRepository, Repository<Long, Invite> inviteRepository) {
         this.userRepository = userRepository;
         this.friendshipRepository = friendshipRepository;
         this.messageRepository = messageRepository;
+        this.inviteRepository = inviteRepository;
         userValidator = new UserValidator();
         friendshipValidator = new FriendshipValidator();
         messageValidator = new MessageValidator();
+        inviteValidator = new InviteValidator();
     }
 
     public Iterable<User> getAllUsers() {
@@ -61,7 +64,6 @@ public class Service {
         for (Friendship friendship : friendshipRepository.findAll())
             if (user.getId() == friendship.getFriend1() || user.getId() == friendship.getFriend2())
                 toBeErased.add(friendship);
-        // faceam delete la friendship din lista din care faceam foreach loop in timpul iterarii
         for (Friendship friendship : toBeErased)
             friendshipRepository.delete(friendship.getId());
         for (User userSearch : userRepository.findAll())
@@ -200,7 +202,7 @@ public class Service {
 
     public Iterable<Message> getConversations(long userId) {
         if (userRepository.findOne(userId) == null)
-            throw new NotFoundException("inexistent user");
+            throw new NotFoundException("nonexistent user");
 
         Collection<Message> conversations = new ArrayList<>();
         for (Message message : messageRepository.findAll())
@@ -252,5 +254,55 @@ public class Service {
         } while (messageRepository.save(message) != null);
         original.setResponse(message.getId());
         return message;
+    }
+
+    public Invite sendInvite(long from, long to) {
+        if (userRepository.findOne(from) == null ||
+                userRepository.findOne(to) == null ||
+                from == to)
+            throw new ValidationException("invalid users ids");
+
+        Invite invite = new Invite(from, to);
+        inviteValidator.validate(invite);
+        Random random = new Random();
+        do {
+            invite.setId((long) (random.nextInt(9000) + 1000));
+        } while (inviteRepository.save(invite) != null);
+        return invite;
+    }
+
+    public Iterable<Invite> getInvites(long userId) {
+        Collection<Invite> invites = new ArrayList<>();
+        for (Invite invite : inviteRepository.findAll())
+            if (invite.getFrom() == userId || invite.getTo() == userId)
+                invites.add(invite);
+        return invites;
+    }
+
+    public void acceptInvite(long userId, long inviteId) {
+        if (userRepository.findOne(userId) == null)
+            throw new NotFoundException("nonexistent user");
+        Invite invite = inviteRepository.findOne(inviteId);
+        if (invite == null ||
+                (invite.getFrom() != userId &&
+                        invite.getTo() != userId) ||
+                invite.getStatus() != InviteStatus.PENDING)
+            throw new ValidationException("invalid invite");
+
+        invite.setStatus(InviteStatus.APPROVED);
+        addFriendship(invite.getFrom(), invite.getTo());
+    }
+
+    public void rejectInvite(long userId, long inviteId) {
+        if (userRepository.findOne(userId) == null)
+            throw new NotFoundException("nonexistent user");
+        Invite invite = inviteRepository.findOne(inviteId);
+        if (invite == null ||
+                (invite.getFrom() != userId &&
+                        invite.getTo() != userId) ||
+                invite.getStatus() != InviteStatus.PENDING)
+            throw new ValidationException("invalid invite");
+
+        invite.setStatus(InviteStatus.REJECTED);
     }
 }
