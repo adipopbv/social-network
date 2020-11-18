@@ -1,12 +1,13 @@
 package socialnetwork.ui;
 
+import socialnetwork.domain.Message;
 import socialnetwork.domain.User;
 import socialnetwork.domain.exceptions.SocialNetworkException;
 import socialnetwork.service.Service;
 
 import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Client {
     private final Service service;
@@ -31,13 +32,13 @@ public class Client {
                         showAllUsers();
                         break;
                     case "2":
-                        showAllFriendships();
-                        break;
-                    case "3":
                         addUser();
                         break;
-                    case "4":
+                    case "3":
                         removeUser();
+                        break;
+                    case "4":
+                        showAllFriendships();
                         break;
                     case "5":
                         addFriendship();
@@ -57,6 +58,18 @@ public class Client {
                     case "10":
                         getUserFriendshipsInMonth();
                         break;
+                    case "11":
+                        sendMessage();
+                        break;
+                    case "12":
+                        listConversations();
+                        break;
+                    case "13":
+                        viewConversation();
+                        break;
+                    case "14":
+                        replyToMessage();
+                        break;
                     default:
                         System.out.println("\ncommand not recognised!");
                         break;
@@ -71,16 +84,25 @@ public class Client {
         System.out.println("\n--- Social Network ---");
         System.out.println("Commands:");
         System.out.println("    [0]: Exit");
+        System.out.println("--Users---------------");
         System.out.println("    [1]: Show all users");
-        System.out.println("    [2]: Show all friendships");
-        System.out.println("    [3]: Add user");
-        System.out.println("    [4]: Remove user");
+        System.out.println("    [2]: Add user");
+        System.out.println("    [3]: Remove user");
+        System.out.println("--Friendships---------");
+        System.out.println("    [4]: Show all friendships");
         System.out.println("    [5]: Add friendship");
         System.out.println("    [6]: Remove friendship");
+        System.out.println("--Communities---------");
         System.out.println("    [7]: Communities count");
         System.out.println("    [8]: Most sociable community");
+        System.out.println("--Friends-------------");
         System.out.println("    [9]: User friendships");
         System.out.println("    [10]: User friendships in month");
+        System.out.println("--Messages------------");
+        System.out.println("    [11]: Send message");
+        System.out.println("    [12]: List conversations");
+        System.out.println("    [13]: View conversation");
+        System.out.println("    [14]: Reply to message");
         System.out.println("----------------------");
     }
 
@@ -163,5 +185,45 @@ public class Client {
         for (User user : friends.keySet()) {
             System.out.println(user.getLastName() + "|" + user.getFirstName() + "|" + friends.get(user));
         }
+    }
+
+    private void sendMessage() {
+        System.out.print("User id: ");
+        long id = Long.parseLong(scanner.nextLine());
+        System.out.print("Send to: ");
+        List<Long> to = Arrays.stream(scanner.nextLine().split(",")).map(Long::parseLong).collect(Collectors.toCollection(Vector::new));
+        System.out.print("Message: ");
+        String message = scanner.nextLine();
+
+        service.sendMessage(id, to, message);
+    }
+
+    private void listConversations() {
+        System.out.print("User id: ");
+        long id = Long.parseLong(scanner.nextLine());
+
+        Iterable<Message> conversations = service.getConversations(id);
+        conversations.forEach(conversation -> System.out.println("Conversation " + conversation.getId() + ": " + conversation.getMessage() + " | ..."));
+    }
+
+    private void viewConversation() {
+        System.out.print("User id: ");
+        long userId = Long.parseLong(scanner.nextLine());
+        System.out.print("Conversation id: ");
+        long conversationId = Long.parseLong(scanner.nextLine());
+
+        Iterable<Message> messages = service.getConversation(userId, conversationId);
+        messages.forEach(message -> System.out.println("User " + message.getFrom() + " (id: " + message.getId() + ") : " + message.getMessage()));
+    }
+
+    private void replyToMessage() {
+        System.out.print("User id: ");
+        long id = Long.parseLong(scanner.nextLine());
+        System.out.print("Reply to message: ");
+        long replyToId = Long.parseLong(scanner.nextLine());
+        System.out.print("Message: ");
+        String messageValue = scanner.nextLine();
+
+        service.replyToMessage(id, replyToId, messageValue);
     }
 }

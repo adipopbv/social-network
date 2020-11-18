@@ -6,6 +6,11 @@ import socialnetwork.domain.validators.Validator;
 import socialnetwork.repository.memory.MemoryRepository;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Vector;
+import java.util.stream.Collectors;
 
 public abstract class AbstractDatabaseRepository<ID, E extends Entity<ID>> extends MemoryRepository<ID, E> {
     Connection connection = null;
@@ -46,6 +51,23 @@ public abstract class AbstractDatabaseRepository<ID, E extends Entity<ID>> exten
     protected void removeFromDatabase (ID id) { }
 
     protected void updateDatabase() { }
+
+    protected String listToDbString(List<Long> list) {
+        StringBuilder dbString = new StringBuilder();
+        if (!list.isEmpty())
+            dbString.append(list.get(0).toString());
+        for (int index = 1; index < list.size(); index++)
+            dbString.append(",").append(list.get(index));
+        return dbString.toString();
+    }
+
+    protected List<Long> dbStringToList(String dbString) {
+        List<Long> list = new ArrayList<>();
+        String[] stringArray = dbString.split(",");
+        if (stringArray.length > 0 && !stringArray[0].equals(""))
+            list = Arrays.stream(stringArray).map(Long::parseLong).collect(Collectors.toCollection(Vector::new));
+        return list;
+    }
 
     @Override
     public void close() {

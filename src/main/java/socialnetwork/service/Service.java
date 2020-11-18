@@ -1,9 +1,13 @@
 package socialnetwork.service;
 
 import socialnetwork.domain.Friendship;
+import socialnetwork.domain.Message;
+import socialnetwork.domain.exceptions.NotFoundException;
+import socialnetwork.domain.exceptions.ValidationException;
 import socialnetwork.domain.graphs.UndirectedGraph;
 import socialnetwork.domain.User;
 import socialnetwork.domain.validators.FriendshipValidator;
+import socialnetwork.domain.validators.MessageValidator;
 import socialnetwork.domain.validators.UserValidator;
 import socialnetwork.repository.Repository;
 
@@ -14,14 +18,18 @@ import java.util.stream.Collectors;
 public class Service {
     private final Repository<Long, User> userRepository;
     private final Repository<Long, Friendship> friendshipRepository;
+    private final Repository<Long, Message> messageRepository;
     private final UserValidator userValidator;
     private final FriendshipValidator friendshipValidator;
+    private final MessageValidator messageValidator;
 
-    public Service(Repository<Long, User> userRepository, Repository<Long, Friendship> friendshipRepository) {
+    public Service(Repository<Long, User> userRepository, Repository<Long, Friendship> friendshipRepository, Repository<Long, Message> messageRepository) {
         this.userRepository = userRepository;
         this.friendshipRepository = friendshipRepository;
+        this.messageRepository = messageRepository;
         userValidator = new UserValidator();
         friendshipValidator = new FriendshipValidator();
+        messageValidator = new MessageValidator();
     }
 
     public Iterable<User> getAllUsers() {
@@ -30,6 +38,10 @@ public class Service {
 
     public Iterable<Friendship> getAllFriendships() {
         return friendshipRepository.findAll();
+    }
+
+    public Iterable<Message> getAllMessages() {
+        return messageRepository.findAll();
     }
 
     public User addUser(String firstName, String lastName) {
@@ -103,6 +115,7 @@ public class Service {
     public void close() {
         userRepository.close();
         friendshipRepository.close();
+        messageRepository.close();
     }
 
     public Iterable<User> getMostSociableCommunity() {
@@ -161,5 +174,83 @@ public class Service {
         });
 
         return friends;
+    }
+
+    public Message sendMessage(long id, List<Long> to, String messageValue) {
+        Message message = new Message(id, to, messageValue);
+        message.setReply(false);
+
+        messageValidator.validate(message);
+        boolean okTo = true;
+        for (Long toId : to)
+            if (userRepository.findOne(toId) == null) {
+                okTo = false;
+                break;
+            }
+        if (userRepository.findOne(id) == null ||
+                !okTo)
+            throw new ValidationException("invalid users");
+
+        Random random = new Random();
+        do {
+            message.setId((long) (random.nextInt(9000) + 1000));
+        } while (messageRepository.save(message) != null);
+        return message;
+    }
+
+    public Iterable<Message> getConversations(long userId) {
+        if (userRepository.findOne(userId) == null)
+            throw new NotFoundException("inexistent user");
+
+        Collection<Message> conversations = new ArrayList<>();
+        for (Message message : messageRepository.findAll())
+            conversations.add(message);
+        conversations = conversations.stream()
+                .filter(conversation ->
+                        (conversation.getFrom().equals(userId) ||
+                                conversation.getTo().contains(userId)) &&
+                                !conversation.isReply())
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        return conversations;
+    }
+
+    public Iterable<Message> getConversation(long userId, long conversationId) {
+        if (userRepository.findOne(userId) == null)
+            throw new ValidationException("invalid user");
+        if (messageRepository.findOne(conversationId) == null ||
+                (messageRepository.findOne(conversationId).getFrom() != userId &&
+                        !messageRepository.findOne(conversationId).getTo().contains(userId)))
+            throw new ValidationException("invalid message");
+
+        List<Message> conversation = new ArrayList<>();
+        Message message = messageRepository.findOne(conversationId);
+        conversation.add(message);
+        while (message.getResponse() != 0) {
+            message = messageRepository.findOne(message.getResponse());
+            conversation.add(message);
+        }
+        return conversation;
+    }
+
+    public Message replyToMessage(long userId, long replyToId, String messageValue) {
+        if (userRepository.findOne(userId) == null)
+            throw new ValidationException("invalid user");
+        if (messageRepository.findOne(replyToId) == null ||
+                messageRepository.findOne(replyToId).getFrom() == userId ||
+                !messageRepository.findOne(replyToId).getTo().contains(userId))
+            throw new ValidationException("invalid message");
+
+        Message original = messageRepository.findOne(replyToId);
+        Message message = new Message(userId, new ArrayList<>(Arrays.asList(original.getFrom())), messageValue);
+
+        messageValidator.validate(message);
+
+        Random random = new Random();
+        do {
+            message.setId((long) (random.nextInt(9000) + 1000));
+        } while (messageRepository.save(message) != null);
+        original.setResponse(message.getId());
+        return message;
     }
 }
