@@ -6,8 +6,16 @@ import socialnetwork.domain.exceptions.ValidationException;
 public class MessageValidator implements Validator<Message> {
     @Override
     public void validate(Message entity) throws ValidationException {
-//        if (entity.getFrom() < 1 || entity.getFriend1() > 9999 ||
-//                entity.getFriend2() <1 || entity.getFriend2() > 9999)
-//            throw new ValidationException("invalid friendship data");
+        boolean okTo = true;
+        for (Long toId : entity.getTo())
+            if (toId < 1000 || toId > 9999) {
+                okTo = false;
+                break;
+            }
+        if ((entity.getFrom() < 1000 || entity.getFrom() > 9999) ||
+                !okTo ||
+                entity.getTo().contains(entity.getFrom()) ||
+                entity.getMessage().isEmpty())
+            throw new ValidationException("invalid message data");
     }
 }

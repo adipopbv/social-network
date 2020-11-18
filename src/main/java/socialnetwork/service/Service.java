@@ -2,6 +2,8 @@ package socialnetwork.service;
 
 import socialnetwork.domain.Friendship;
 import socialnetwork.domain.Message;
+import socialnetwork.domain.exceptions.NotFoundException;
+import socialnetwork.domain.exceptions.ValidationException;
 import socialnetwork.domain.graphs.UndirectedGraph;
 import socialnetwork.domain.User;
 import socialnetwork.domain.validators.FriendshipValidator;
@@ -177,7 +179,18 @@ public class Service {
     public Message sendMessage(long id, List<Long> to, String messageValue) {
         Message message = new Message(id, to, messageValue);
         message.setReply(false);
+
         messageValidator.validate(message);
+        boolean okTo = true;
+        for (Long toId : to)
+            if (userRepository.findOne(toId) == null) {
+                okTo = false;
+                break;
+            }
+        if (userRepository.findOne(id) == null ||
+                !okTo)
+            throw new ValidationException("invalid users");
+
         Random random = new Random();
         do {
             message.setId((long) (random.nextInt(9000) + 1000));
@@ -186,6 +199,9 @@ public class Service {
     }
 
     public Iterable<Message> getConversations(long userId) {
+        if (userRepository.findOne(userId) == null)
+            throw new NotFoundException("inexistent user");
+
         Collection<Message> conversations = new ArrayList<>();
         for (Message message : messageRepository.findAll())
             conversations.add(message);
@@ -200,6 +216,13 @@ public class Service {
     }
 
     public Iterable<Message> getConversation(long userId, long conversationId) {
+        if (userRepository.findOne(userId) == null)
+            throw new ValidationException("invalid user");
+        if (messageRepository.findOne(conversationId) == null ||
+                (messageRepository.findOne(conversationId).getFrom() != userId &&
+                        !messageRepository.findOne(conversationId).getTo().contains(userId)))
+            throw new ValidationException("invalid message");
+
         List<Message> conversation = new ArrayList<>();
         Message message = messageRepository.findOne(conversationId);
         conversation.add(message);
@@ -211,9 +234,18 @@ public class Service {
     }
 
     public Message replyToMessage(long userId, long replyToId, String messageValue) {
+        if (userRepository.findOne(userId) == null)
+            throw new ValidationException("invalid user");
+        if (messageRepository.findOne(replyToId) == null ||
+                messageRepository.findOne(replyToId).getFrom() == userId ||
+                !messageRepository.findOne(replyToId).getTo().contains(userId))
+            throw new ValidationException("invalid message");
+
         Message original = messageRepository.findOne(replyToId);
         Message message = new Message(userId, new ArrayList<>(Arrays.asList(original.getFrom())), messageValue);
+
         messageValidator.validate(message);
+
         Random random = new Random();
         do {
             message.setId((long) (random.nextInt(9000) + 1000));
