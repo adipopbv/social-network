@@ -9,22 +9,22 @@ public class Message extends Entity<Long> {
     private final List<Long> to;
     private final String message;
     private final LocalDateTime date;
-    private final Message replyTo;
+    private final long response;
 
     public Message(Long from, List<Long> to, String message) {
         this.from = from;
         this.to = to;
         this.message = message;
         this.date = LocalDateTime.now();
-        this.replyTo = null;
+        this.response = 0;
     }
 
-    public Message(Long from, List<Long> to, String message, Message replyTo) {
+    public Message(Long from, List<Long> to, String message, Long response) {
         this.from = from;
         this.to = to;
         this.message = message;
         this.date = LocalDateTime.now();
-        this.replyTo = replyTo;
+        this.response = response;
     }
 
     public Message(Long from, List<Long> to, String message, LocalDateTime date) {
@@ -32,15 +32,15 @@ public class Message extends Entity<Long> {
         this.to = to;
         this.message = message;
         this.date = date;
-        this.replyTo = null;
+        this.response = 0;
     }
 
-    public Message(Long from, List<Long> to, String message, LocalDateTime date, Message replyTo) {
+    public Message(Long from, List<Long> to, String message, LocalDateTime date, Long response) {
         this.from = from;
         this.to = to;
         this.message = message;
         this.date = date;
-        this.replyTo = replyTo;
+        this.response = response;
     }
 
     public Long getFrom() {
@@ -59,18 +59,19 @@ public class Message extends Entity<Long> {
         return date;
     }
 
-    public Message getReplyTo() {
-        return replyTo;
+    public Long getResponse() {
+        return response;
     }
 
     @Override
     public String toString() {
         return "Message{" +
-                "\n from=" + from +
-                "\n , to=" + to +
-                "\n , message='" + message + '\'' +
-                "\n , date=" + date +
-                "\n , replyTo=" + ((replyTo == null) ? "none" : replyTo.getId()) +
+                "\n id = " + getId() +
+                ",\n from = " + getFrom() +
+                ",\n to = " + getTo() +
+                ",\n message = '" + getMessage() + '\'' +
+                ",\n date = " + getDate() +
+                ",\n response = " + ((response == 0) ? "none" : response) +
                 "\n}";
     }
 
@@ -83,11 +84,11 @@ public class Message extends Entity<Long> {
                 getTo().equals(message1.getTo()) &&
                 getMessage().equals(message1.getMessage()) &&
                 getDate().equals(message1.getDate()) &&
-                getReplyTo().equals(message1.getReplyTo());
+                getResponse().equals(message1.getResponse());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getFrom(), getTo(), getMessage(), getDate(), getMessage());
+        return Objects.hash(getFrom(), getTo(), getMessage(), getDate(), getMessage(), getResponse());
     }
 }

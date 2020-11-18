@@ -187,9 +187,22 @@ public class Service {
         Collection<Message> conversations = new ArrayList<>();
         for (Message message : messageRepository.findAll())
             conversations.add(message);
+
         conversations = conversations.stream()
-                .filter(message -> message.getReplyTo() == null)
+                .filter(message -> message.getResponse() == 0)
                 .collect(Collectors.toCollection(ArrayList::new));
+
         return conversations;
+    }
+
+    public Iterable<Message> getConversation(long id) {
+        List<Message> conversation = new ArrayList<>();
+        Message message = messageRepository.findOne(id);
+        conversation.add(message);
+        while (message.getResponse() != 0) {
+            message = messageRepository.findOne(message.getResponse());
+            conversation.add(message);
+        }
+        return conversation;
     }
 }

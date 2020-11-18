@@ -200,11 +200,15 @@ public class Client {
 
     private void listConversations() {
         Iterable<Message> conversations = service.getConversations();
-        conversations.forEach(System.out::println);
+        conversations.forEach(conversation -> System.out.println("Conversation " + conversation.getId() + ": " + conversation.getMessage() + " | ..."));
     }
 
     private void viewConversation() {
+        System.out.print("Message id: ");
+        long id = Long.parseLong(scanner.nextLine());
 
+        Iterable<Message> messages = service.getConversation(id);
+        messages.forEach(message -> System.out.println("User " + message.getFrom() + " (id: " + message.getId() + ") : " + message.getMessage()));
     }
 
     private void replyToMessage() {

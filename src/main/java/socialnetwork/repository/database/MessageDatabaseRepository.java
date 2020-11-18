@@ -24,9 +24,9 @@ public class MessageDatabaseRepository extends AbstractDatabaseRepository<Long, 
                 List<Long> to = dbStringToList(data.getString("to_ids"));
                 String messageValue = data.getString("message_value");
                 LocalDateTime date = data.getTimestamp("date").toLocalDateTime();
-                Message replyTo = (data.getInt("reply_to_id") != 0) ? entities.get((long) (data.getInt("replyTo"))) : null;
+                long response = (data.getInt("response_id") != 0) ? ((long) (data.getInt("response_id"))) : 0;
 
-                Message message = new Message(from, to, messageValue, date, replyTo);
+                Message message = new Message(from, to, messageValue, date, response);
                 message.setId(id);
 
                 entities.putIfAbsent(message.getId(), message);
@@ -40,13 +40,13 @@ public class MessageDatabaseRepository extends AbstractDatabaseRepository<Long, 
     @Override
     protected void addToDatabase(Message entity) {
         try {
-            statement.executeUpdate("insert into messages(message_id, from_id, to_ids, message_value, date, reply_to_id) " +
+            statement.executeUpdate("insert into messages(message_id, from_id, to_ids, message_value, date, response_id) " +
                     "values (" + entity.getId() +
                     ", " + entity.getFrom() +
                     ", '" + listToDbString(entity.getTo()) +
                     "', '" + entity.getMessage() +
                     "', '" + Timestamp.valueOf(entity.getDate()) +
-                    "', " + ((entity.getReplyTo() == null) ? "null" : entity.getReplyTo().getId()) +
+                    "', " + ((entity.getResponse() == 0) ? "null" : entity.getResponse()) +
                     ");");
         } catch (Exception exception) {
             throw new DatabaseException("could not add to database");
@@ -73,12 +73,12 @@ public class MessageDatabaseRepository extends AbstractDatabaseRepository<Long, 
                         !toList.equals(entities.get(id).getTo()) ||
                         !data.getString("message_value").equals(entities.get(id).getMessage()) ||
                         !data.getTimestamp("date").toLocalDateTime().equals(entities.get(id).getDate()) ||
-                        data.getInt("reply_to_id") != ((entities.get(id).getReplyTo() == null) ? 0 : entities.get(id).getReplyTo().getId())) {
+                        data.getInt("response_id") != ((entities.get(id).getResponse() == 0) ? 0 : entities.get(id).getResponse())) {
                     statement.executeUpdate("update messages set from_id = " + entities.get(id).getFrom() + " where message_id = " + id + ";");
                     statement.executeUpdate("update messages set to_ids = '" + listToDbString(entities.get(id).getTo()) + "' where message_id = " + id + ";");
                     statement.executeUpdate("update messages set message_value = '" + entities.get(id).getMessage() + "' where message_id = " + id + ";");
                     statement.executeUpdate("update messages set date = " + Timestamp.valueOf(entities.get(id).getDate()) + " where message_id = " + id + ";");
-                    statement.executeUpdate("update messages set reply_to_id = " + ((entities.get(id).getReplyTo() == null) ? "null" : entities.get(id).getReplyTo().getId()) + " where message_id = " + id + ";");
+                    statement.executeUpdate("update messages set response_id = " + ((entities.get(id).getResponse() == 0) ? "null" : entities.get(id).getResponse()) + " where message_id = " + id + ";");
                 }
             }
         } catch (Exception exception) {
