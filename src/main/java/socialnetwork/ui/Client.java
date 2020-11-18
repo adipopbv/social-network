@@ -1,5 +1,6 @@
 package socialnetwork.ui;
 
+import socialnetwork.domain.Message;
 import socialnetwork.domain.User;
 import socialnetwork.domain.exceptions.SocialNetworkException;
 import socialnetwork.service.Service;
@@ -198,7 +199,8 @@ public class Client {
     }
 
     private void listConversations() {
-
+        Iterable<Message> conversations = service.getConversations();
+        conversations.forEach(System.out::println);
     }
 
     private void viewConversation() {

@@ -70,7 +70,7 @@ public class Message extends Entity<Long> {
                 "\n , to=" + to +
                 "\n , message='" + message + '\'' +
                 "\n , date=" + date +
-                "\n , replyTo=" + replyTo.getId() +
+                "\n , replyTo=" + ((replyTo == null) ? "none" : replyTo.getId()) +
                 "\n}";
     }
 

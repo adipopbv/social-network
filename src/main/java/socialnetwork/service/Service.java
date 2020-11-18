@@ -182,4 +182,14 @@ public class Service {
         } while (messageRepository.save(message) != null);
         return message;
     }
+
+    public Iterable<Message> getConversations() {
+        Collection<Message> conversations = new ArrayList<>();
+        for (Message message : messageRepository.findAll())
+            conversations.add(message);
+        conversations = conversations.stream()
+                .filter(message -> message.getReplyTo() == null)
+                .collect(Collectors.toCollection(ArrayList::new));
+        return conversations;
+    }
 }
