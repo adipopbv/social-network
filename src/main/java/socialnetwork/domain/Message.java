@@ -9,7 +9,8 @@ public class Message extends Entity<Long> {
     private final List<Long> to;
     private final String message;
     private final LocalDateTime date;
-    private final long response;
+    private long response;
+    private boolean isReply = true;
 
     public Message(Long from, List<Long> to, String message) {
         this.from = from;
@@ -27,20 +28,13 @@ public class Message extends Entity<Long> {
         this.response = response;
     }
 
-    public Message(Long from, List<Long> to, String message, LocalDateTime date) {
-        this.from = from;
-        this.to = to;
-        this.message = message;
-        this.date = date;
-        this.response = 0;
-    }
-
-    public Message(Long from, List<Long> to, String message, LocalDateTime date, Long response) {
+    public Message(Long from, List<Long> to, String message, LocalDateTime date, Long response, Boolean isReply) {
         this.from = from;
         this.to = to;
         this.message = message;
         this.date = date;
         this.response = response;
+        this.isReply = isReply;
     }
 
     public Long getFrom() {
@@ -61,6 +55,18 @@ public class Message extends Entity<Long> {
 
     public Long getResponse() {
         return response;
+    }
+
+    public void setResponse(long response) {
+        this.response = response;
+    }
+
+    public boolean isReply() {
+        return isReply;
+    }
+
+    public void setReply(boolean reply) {
+        isReply = reply;
     }
 
     @Override

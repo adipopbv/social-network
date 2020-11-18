@@ -199,19 +199,31 @@ public class Client {
     }
 
     private void listConversations() {
-        Iterable<Message> conversations = service.getConversations();
+        System.out.print("User id: ");
+        long id = Long.parseLong(scanner.nextLine());
+
+        Iterable<Message> conversations = service.getConversations(id);
         conversations.forEach(conversation -> System.out.println("Conversation " + conversation.getId() + ": " + conversation.getMessage() + " | ..."));
     }
 
     private void viewConversation() {
-        System.out.print("Message id: ");
-        long id = Long.parseLong(scanner.nextLine());
+        System.out.print("User id: ");
+        long userId = Long.parseLong(scanner.nextLine());
+        System.out.print("Conversation id: ");
+        long conversationId = Long.parseLong(scanner.nextLine());
 
-        Iterable<Message> messages = service.getConversation(id);
+        Iterable<Message> messages = service.getConversation(userId, conversationId);
         messages.forEach(message -> System.out.println("User " + message.getFrom() + " (id: " + message.getId() + ") : " + message.getMessage()));
     }
 
     private void replyToMessage() {
+        System.out.print("User id: ");
+        long id = Long.parseLong(scanner.nextLine());
+        System.out.print("Reply to message: ");
+        long replyToId = Long.parseLong(scanner.nextLine());
+        System.out.print("Message: ");
+        String messageValue = scanner.nextLine();
 
+        service.replyToMessage(id, replyToId, messageValue);
     }
 }

@@ -113,6 +113,7 @@ public class Service {
     public void close() {
         userRepository.close();
         friendshipRepository.close();
+        messageRepository.close();
     }
 
     public Iterable<User> getMostSociableCommunity() {
@@ -175,6 +176,7 @@ public class Service {
 
     public Message sendMessage(long id, List<Long> to, String messageValue) {
         Message message = new Message(id, to, messageValue);
+        message.setReply(false);
         messageValidator.validate(message);
         Random random = new Random();
         do {
@@ -183,26 +185,40 @@ public class Service {
         return message;
     }
 
-    public Iterable<Message> getConversations() {
+    public Iterable<Message> getConversations(long userId) {
         Collection<Message> conversations = new ArrayList<>();
         for (Message message : messageRepository.findAll())
             conversations.add(message);
-
         conversations = conversations.stream()
-                .filter(message -> message.getResponse() == 0)
+                .filter(conversation ->
+                        (conversation.getFrom().equals(userId) ||
+                                conversation.getTo().contains(userId)) &&
+                                !conversation.isReply())
                 .collect(Collectors.toCollection(ArrayList::new));
 
         return conversations;
     }
 
-    public Iterable<Message> getConversation(long id) {
+    public Iterable<Message> getConversation(long userId, long conversationId) {
         List<Message> conversation = new ArrayList<>();
-        Message message = messageRepository.findOne(id);
+        Message message = messageRepository.findOne(conversationId);
         conversation.add(message);
         while (message.getResponse() != 0) {
             message = messageRepository.findOne(message.getResponse());
             conversation.add(message);
         }
         return conversation;
+    }
+
+    public Message replyToMessage(long userId, long replyToId, String messageValue) {
+        Message original = messageRepository.findOne(replyToId);
+        Message message = new Message(userId, new ArrayList<>(Arrays.asList(original.getFrom())), messageValue);
+        messageValidator.validate(message);
+        Random random = new Random();
+        do {
+            message.setId((long) (random.nextInt(9000) + 1000));
+        } while (messageRepository.save(message) != null);
+        original.setResponse(message.getId());
+        return message;
     }
 }
