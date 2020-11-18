@@ -1,7 +1,6 @@
 package socialnetwork.repository.database;
 
 import socialnetwork.domain.Message;
-import socialnetwork.domain.User;
 import socialnetwork.domain.exceptions.DatabaseException;
 import socialnetwork.domain.validators.Validator;
 
@@ -74,7 +73,7 @@ public class MessageDatabaseRepository extends AbstractDatabaseRepository<Long, 
                         !toList.equals(entities.get(id).getTo()) ||
                         !data.getString("message_value").equals(entities.get(id).getMessage()) ||
                         !data.getTimestamp("date").toLocalDateTime().equals(entities.get(id).getDate()) ||
-                        data.getInt("reply_to_id") != ((entities.get(id).getReplyTo() == null) ? 0 : entities.get(id).getReplyTo().getId()) {
+                        data.getInt("reply_to_id") != ((entities.get(id).getReplyTo() == null) ? 0 : entities.get(id).getReplyTo().getId())) {
                     statement.executeUpdate("update messages set from_id = " + entities.get(id).getFrom() + " where message_id = " + id + ";");
                     statement.executeUpdate("update messages set to_ids = '" + listToDbString(entities.get(id).getTo()) + "' where message_id = " + id + ";");
                     statement.executeUpdate("update messages set message_value = '" + entities.get(id).getMessage() + "' where message_id = " + id + ";");

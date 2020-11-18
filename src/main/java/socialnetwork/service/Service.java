@@ -172,4 +172,14 @@ public class Service {
 
         return friends;
     }
+
+    public Message sendMessage(long id, List<Long> to, String messageValue) {
+        Message message = new Message(id, to, messageValue);
+        messageValidator.validate(message);
+        Random random = new Random();
+        do {
+            message.setId((long) (random.nextInt(9000) + 1000));
+        } while (messageRepository.save(message) != null);
+        return message;
+    }
 }

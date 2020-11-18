@@ -5,8 +5,8 @@ import socialnetwork.domain.exceptions.SocialNetworkException;
 import socialnetwork.service.Service;
 
 import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Client {
     private final Service service;
@@ -187,7 +187,14 @@ public class Client {
     }
 
     private void sendMessage() {
+        System.out.print("User id: ");
+        long id = Long.parseLong(scanner.nextLine());
+        System.out.print("Send to: ");
+        List<Long> to = Arrays.stream(scanner.nextLine().split(",")).map(Long::parseLong).collect(Collectors.toCollection(Vector::new));
+        System.out.print("Message: ");
+        String message = scanner.nextLine();
 
+        service.sendMessage(id, to, message);
     }
 
     private void listConversations() {
