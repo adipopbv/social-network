@@ -9,11 +9,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MemoryRepository<ID, E extends Entity<ID>> implements Repository<ID,E> {
-    protected Validator<E> validator;
     protected Map<ID,E> entities;
 
-    public MemoryRepository(Validator<E> validator) {
-        this.validator = validator;
+    public MemoryRepository() {
         entities = new HashMap<>();
     }
 
@@ -33,7 +31,6 @@ public class MemoryRepository<ID, E extends Entity<ID>> implements Repository<ID
     public E save(E entity) {
         if (entity == null)
             throw new IllegalArgumentException("entity must not be null");
-        validator.validate(entity);
 
         if(entities.get(entity.getId()) != null)
             return entity;
@@ -55,7 +52,6 @@ public class MemoryRepository<ID, E extends Entity<ID>> implements Repository<ID
     public E update(E entity) {
         if(entity == null)
             throw new IllegalArgumentException("entity must be not null!");
-        validator.validate(entity);
 
         entities.put(entity.getId(),entity);
         if(entities.get(entity.getId()) != null) {

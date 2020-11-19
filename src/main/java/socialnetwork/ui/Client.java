@@ -1,8 +1,10 @@
 package socialnetwork.ui;
 
+import socialnetwork.domain.Invite;
 import socialnetwork.domain.Message;
 import socialnetwork.domain.User;
 import socialnetwork.domain.exceptions.SocialNetworkException;
+import socialnetwork.domain.exceptions.ValidationException;
 import socialnetwork.service.Service;
 
 import java.time.LocalDateTime;
@@ -41,33 +43,42 @@ public class Client {
                         showAllFriendships();
                         break;
                     case "5":
-                        addFriendship();
+                        sendInvite();
                         break;
                     case "6":
-                        removeFriendship();
+                        getInvites();
                         break;
                     case "7":
-                        getCommunitiesCount();
+                        acceptInvite();
                         break;
                     case "8":
-                        getMostSociableCommunity();
+                        rejectInvite();
                         break;
                     case "9":
-                        getUserFriendships();
+                        removeFriendship();
                         break;
                     case "10":
-                        getUserFriendshipsInMonth();
+                        getCommunitiesCount();
                         break;
                     case "11":
-                        sendMessage();
+                        getMostSociableCommunity();
                         break;
                     case "12":
-                        listConversations();
+                        getUserFriendships();
                         break;
                     case "13":
-                        viewConversation();
+                        getUserFriendshipsInMonth();
                         break;
                     case "14":
+                        sendMessage();
+                        break;
+                    case "15":
+                        listConversations();
+                        break;
+                    case "16":
+                        viewConversation();
+                        break;
+                    case "17":
                         replyToMessage();
                         break;
                     default:
@@ -90,19 +101,22 @@ public class Client {
         System.out.println("    [3]: Remove user");
         System.out.println("--Friendships---------");
         System.out.println("    [4]: Show all friendships");
-        System.out.println("    [5]: Add friendship");
-        System.out.println("    [6]: Remove friendship");
+        System.out.println("    [5]: Send invite");
+        System.out.println("    [6]: Show invites");
+        System.out.println("    [7]: Accept invite");
+        System.out.println("    [8]: Reject invite");
+        System.out.println("    [9]: Remove friendship");
         System.out.println("--Communities---------");
-        System.out.println("    [7]: Communities count");
-        System.out.println("    [8]: Most sociable community");
+        System.out.println("    [10]: Communities count");
+        System.out.println("    [11]: Most sociable community");
         System.out.println("--Friends-------------");
-        System.out.println("    [9]: User friendships");
-        System.out.println("    [10]: User friendships in month");
+        System.out.println("    [12]: User friendships");
+        System.out.println("    [13]: User friendships in month");
         System.out.println("--Messages------------");
-        System.out.println("    [11]: Send message");
-        System.out.println("    [12]: List conversations");
-        System.out.println("    [13]: View conversation");
-        System.out.println("    [14]: Reply to message");
+        System.out.println("    [14]: Send message");
+        System.out.println("    [15]: List conversations");
+        System.out.println("    [16]: View conversation");
+        System.out.println("    [17]: Reply to message");
         System.out.println("----------------------");
     }
 
@@ -130,19 +144,62 @@ public class Client {
         service.removeUser(Long.parseLong(id));
     }
 
-    private void addFriendship() {
-        System.out.print("Friend 1 id: ");
-        String id1 = scanner.nextLine();
-        System.out.print("Friend 2 id: ");
-        String id2 = scanner.nextLine();
+    private void sendInvite() {
+        System.out.print("User id: ");
+        String fromId = scanner.nextLine();
+        System.out.print("Send to id: ");
+        String toId = scanner.nextLine();
         try {
-            Long.parseLong(id1);
-            Long.parseLong(id2);
+            Long.parseLong(fromId);
+            Long.parseLong(toId);
         } catch (Exception e) {
-            id1 = id2 = "-1";
+            throw new ValidationException("invalid ids");
         }
 
-        service.addFriendship(Long.parseLong(id1), Long.parseLong(id2));
+        service.sendInvite(Long.parseLong(fromId), Long.parseLong(toId));
+    }
+
+    private void getInvites() {
+        System.out.print("User id: ");
+        String id = scanner.nextLine();
+        try {
+            Long.parseLong(id);
+        } catch (Exception e) {
+            throw new ValidationException("invalid id");
+        }
+
+        Iterable<Invite> invites = service.getInvites(Long.parseLong(id));
+        invites.forEach(invite -> System.out.println("Invite " + invite.getId() + " from " + invite.getFrom() + " to " + invite.getTo() + ". Status: " + invite.getStatus()));
+    }
+
+    private void acceptInvite() {
+        System.out.print("User id: ");
+        String userId = scanner.nextLine();
+        System.out.print("Invite id: ");
+        String inviteId = scanner.nextLine();
+        try {
+            Long.parseLong(userId);
+            Long.parseLong(inviteId);
+        } catch (Exception e) {
+            throw new ValidationException("invalid ids");
+        }
+
+        service.acceptInvite(Long.parseLong(userId), Long.parseLong(inviteId));
+    }
+
+    private void rejectInvite() {
+        System.out.print("User id: ");
+        String userId = scanner.nextLine();
+        System.out.print("Invite id: ");
+        String inviteId = scanner.nextLine();
+        try {
+            Long.parseLong(userId);
+            Long.parseLong(inviteId);
+        } catch (Exception e) {
+            throw new ValidationException("invalid ids");
+        }
+
+        service.rejectInvite(Long.parseLong(userId), Long.parseLong(inviteId));
     }
 
     private void removeFriendship() {
@@ -168,6 +225,11 @@ public class Client {
     private void getUserFriendships() {
         System.out.print("User id: ");
         String id = scanner.nextLine();
+        try {
+            Long.parseLong(id);
+        } catch (Exception e) {
+            throw new ValidationException("invalid user id");
+        }
 
         Map<User, LocalDateTime> friends = service.getUserFriendships(Long.parseLong(id));
         for (User user : friends.keySet()) {
@@ -180,6 +242,12 @@ public class Client {
         String id = scanner.nextLine();
         System.out.print("Month of friendship: ");
         String month = scanner.nextLine();
+        try {
+            Long.parseLong(id);
+            Integer.parseInt(month);
+        } catch (Exception e) {
+            throw new ValidationException("invalid data");
+        }
 
         Map<User, LocalDateTime> friends = service.getUserFriendshipsInMonth(Long.parseLong(id), Integer.parseInt(month));
         for (User user : friends.keySet()) {
@@ -189,41 +257,65 @@ public class Client {
 
     private void sendMessage() {
         System.out.print("User id: ");
-        long id = Long.parseLong(scanner.nextLine());
+        String id = scanner.nextLine();
         System.out.print("Send to: ");
-        List<Long> to = Arrays.stream(scanner.nextLine().split(",")).map(Long::parseLong).collect(Collectors.toCollection(Vector::new));
+        String toStr = scanner.nextLine();
+        List<Long> to;
         System.out.print("Message: ");
         String message = scanner.nextLine();
+        try {
+            Long.parseLong(id);
+            to = Arrays.stream(toStr.split(",")).map(Long::parseLong).collect(Collectors.toCollection(Vector::new));
+        } catch (Exception e) {
+            throw new ValidationException("invalid data");
+        }
 
-        service.sendMessage(id, to, message);
+        service.sendMessage(Long.parseLong(id), to, message);
     }
 
     private void listConversations() {
         System.out.print("User id: ");
-        long id = Long.parseLong(scanner.nextLine());
+        String id = scanner.nextLine();
+        try {
+            Long.parseLong(id);
+        } catch (Exception e) {
+            throw new ValidationException("invalid id");
+        }
 
-        Iterable<Message> conversations = service.getConversations(id);
+        Iterable<Message> conversations = service.getConversations(Long.parseLong(id));
         conversations.forEach(conversation -> System.out.println("Conversation " + conversation.getId() + ": " + conversation.getMessage() + " | ..."));
     }
 
     private void viewConversation() {
         System.out.print("User id: ");
-        long userId = Long.parseLong(scanner.nextLine());
+        String userId = scanner.nextLine();
         System.out.print("Conversation id: ");
-        long conversationId = Long.parseLong(scanner.nextLine());
+        String conversationId = scanner.nextLine();
+        try {
+            Long.parseLong(userId);
+            Long.parseLong(conversationId);
+        } catch (Exception e) {
+            throw new ValidationException("invalid data");
+        }
 
-        Iterable<Message> messages = service.getConversation(userId, conversationId);
+        Iterable<Message> messages = service.getConversation(Long.parseLong(userId), Long.parseLong(conversationId));
         messages.forEach(message -> System.out.println("User " + message.getFrom() + " (id: " + message.getId() + ") : " + message.getMessage()));
     }
 
     private void replyToMessage() {
         System.out.print("User id: ");
-        long id = Long.parseLong(scanner.nextLine());
+        String id = scanner.nextLine();
         System.out.print("Reply to message: ");
-        long replyToId = Long.parseLong(scanner.nextLine());
+        String replyToId = scanner.nextLine();
         System.out.print("Message: ");
         String messageValue = scanner.nextLine();
+        try {
+            Long.parseLong(id);
+            Long.parseLong(replyToId);
+        } catch (Exception e) {
+            throw new ValidationException("invalid data");
+        }
 
-        service.replyToMessage(id, replyToId, messageValue);
+        service.replyToMessage(Long.parseLong(id), Long.parseLong(replyToId), messageValue);
     }
 }

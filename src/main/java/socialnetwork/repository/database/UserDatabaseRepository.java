@@ -8,8 +8,8 @@ import java.sql.ResultSet;
 import java.util.List;
 
 public class UserDatabaseRepository extends AbstractDatabaseRepository<Long, User> {
-    public UserDatabaseRepository(String url, String user, String password, Validator<User> validator) {
-        super(url, user, password, validator);
+    public UserDatabaseRepository(String url, String user, String password) {
+        super(url, user, password);
     }
 
     @Override

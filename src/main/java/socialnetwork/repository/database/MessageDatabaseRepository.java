@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class MessageDatabaseRepository extends AbstractDatabaseRepository<Long, Message> {
-    public MessageDatabaseRepository(String url, String user, String password, Validator<Message> validator) {
-        super(url, user, password, validator);
+    public MessageDatabaseRepository(String url, String user, String password) {
+        super(url, user, password);
     }
 
     @Override

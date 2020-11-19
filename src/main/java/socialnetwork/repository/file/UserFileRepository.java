@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Vector;
 
 public class UserFileRepository extends AbstractFileRepository<Long, User>{
-    public UserFileRepository(String fileName, Validator<User> validator) {
-        super(fileName, validator);
+    public UserFileRepository(String fileName) {
+        super(fileName);
     }
 
     @Override

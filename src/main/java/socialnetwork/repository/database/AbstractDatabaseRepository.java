@@ -16,8 +16,7 @@ public abstract class AbstractDatabaseRepository<ID, E extends Entity<ID>> exten
     Connection connection = null;
     Statement statement = null;
 
-    public AbstractDatabaseRepository(String url, String user, String password, Validator<E> validator) {
-        super(validator);
+    public AbstractDatabaseRepository(String url, String user, String password) {
         try {
             Class.forName("org.postgresql.Driver");
             connection = DriverManager.getConnection(url, user, password);
