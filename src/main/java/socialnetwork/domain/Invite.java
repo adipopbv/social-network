@@ -12,6 +12,12 @@ public class Invite extends Entity<Long> {
         this.to = to;
     }
 
+    public Invite(Long from, Long to, InviteStatus status) {
+        this.from = from;
+        this.to = to;
+        this.status = status;
+    }
+
     public Long getFrom() {
         return from;
     }

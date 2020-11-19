@@ -1,6 +1,7 @@
 package socialnetwork.service;
 
 import socialnetwork.domain.*;
+import socialnetwork.domain.exceptions.DuplicateException;
 import socialnetwork.domain.exceptions.NotFoundException;
 import socialnetwork.domain.exceptions.ValidationException;
 import socialnetwork.domain.graphs.UndirectedGraph;
@@ -112,12 +113,6 @@ public class Service {
         }
         UndirectedGraph graph = new UndirectedGraph(adjMap);
         return graph.getConnectedComponentsCount();
-    }
-
-    public void close() {
-        userRepository.close();
-        friendshipRepository.close();
-        messageRepository.close();
     }
 
     public Iterable<User> getMostSociableCommunity() {
@@ -261,6 +256,13 @@ public class Service {
                 userRepository.findOne(to) == null ||
                 from == to)
             throw new ValidationException("invalid users ids");
+        if (userRepository.findOne(to).getFriends().contains(from))
+            throw new DuplicateException("users already friends");
+        for (Invite invite : inviteRepository.findAll())
+            if (((invite.getFrom() == from && invite.getTo() == to) ||
+                    (invite.getFrom() == to && invite.getTo() == from)) &&
+                    invite.getStatus() != InviteStatus.REJECTED)
+                throw new DuplicateException("users already trying to connect");
 
         Invite invite = new Invite(from, to);
         inviteValidator.validate(invite);
@@ -284,8 +286,8 @@ public class Service {
             throw new NotFoundException("nonexistent user");
         Invite invite = inviteRepository.findOne(inviteId);
         if (invite == null ||
-                (invite.getFrom() != userId &&
-                        invite.getTo() != userId) ||
+                invite.getFrom() == userId ||
+                invite.getTo() != userId ||
                 invite.getStatus() != InviteStatus.PENDING)
             throw new ValidationException("invalid invite");
 
@@ -304,5 +306,12 @@ public class Service {
             throw new ValidationException("invalid invite");
 
         invite.setStatus(InviteStatus.REJECTED);
+    }
+
+    public void close() {
+        userRepository.close();
+        friendshipRepository.close();
+        messageRepository.close();
+        inviteRepository.close();
     }
 }

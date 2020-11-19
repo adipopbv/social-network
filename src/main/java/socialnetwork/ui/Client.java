@@ -169,7 +169,7 @@ public class Client {
         }
 
         Iterable<Invite> invites = service.getInvites(Long.parseLong(id));
-        invites.forEach(invite -> System.out.println("Invite from " + invite.getFrom() + " to " + invite.getTo() + ". Status: " + invite.getStatus()));
+        invites.forEach(invite -> System.out.println("Invite " + invite.getId() + " from " + invite.getFrom() + " to " + invite.getTo() + ". Status: " + invite.getStatus()));
     }
 
     private void acceptInvite() {

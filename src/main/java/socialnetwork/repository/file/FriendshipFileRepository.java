@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class FriendshipFileRepository extends AbstractFileRepository<Long, Friendship> {
-    public FriendshipFileRepository(String fileName, Validator<Friendship> validator) {
-        super(fileName, validator);
+    public FriendshipFileRepository(String fileName) {
+        super(fileName);
     }
 
     @Override
