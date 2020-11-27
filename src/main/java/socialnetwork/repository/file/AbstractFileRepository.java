@@ -12,8 +12,7 @@ import java.util.List;
 public abstract class AbstractFileRepository<ID, E extends Entity<ID>> extends MemoryRepository<ID,E> {
     protected String fileName;
 
-    public AbstractFileRepository(String fileName, Validator<E> validator) {
-        super(validator);
+    public AbstractFileRepository(String fileName) {
         this.fileName=fileName;
         loadData();
     }

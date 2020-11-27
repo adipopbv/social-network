@@ -1,24 +1,24 @@
 package socialnetwork;
 
 import socialnetwork.domain.Friendship;
+import socialnetwork.domain.Invite;
+import socialnetwork.domain.Message;
 import socialnetwork.domain.User;
-import socialnetwork.domain.validators.FriendshipValidator;
-import socialnetwork.domain.validators.UserValidator;
 import socialnetwork.repository.Repository;
-import socialnetwork.repository.file.FriendshipFileRepository;
-import socialnetwork.repository.file.UserFileRepository;
+import socialnetwork.repository.database.*;
 import socialnetwork.service.Service;
-import socialnetwork.ui.Client;
+import socialnetwork.ui.*;
 
 public class Main {
     public static void main(String[] args) {
-        Repository<Long, User> userRepository = new UserFileRepository("data/users.csv", new UserValidator());
-        Repository<Long, Friendship> friendshipRepository = new FriendshipFileRepository("data/friendships.csv", new FriendshipValidator());
-        Service service = new Service(userRepository, friendshipRepository);
-        Client client = new Client(service);
+        String dbUrl = "jdbc:postgresql://localhost:5432/SocialNetwork";
+        Repository<Long, User> userRepository = new UserDatabaseRepository(dbUrl, "postgres", "postgres");
+        Repository<Long, Friendship> friendshipRepository = new FriendshipDatabaseRepository(dbUrl, "postgres", "postgres");
+        Repository<Long, Message> messageRepository = new MessageDatabaseRepository(dbUrl, "postgres", "postgres");
+        Repository<Long, Invite> inviteRepository = new InviteDatabaseRepository(dbUrl, "postgres", "postgres");
+        Service service = new Service(userRepository, friendshipRepository, messageRepository, inviteRepository);
+        Client client = new TuiClient(service);
 
         client.run();
     }
 }
-
-
