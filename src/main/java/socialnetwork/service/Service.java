@@ -36,18 +36,36 @@ public class Service {
         inviteValidator = new InviteValidator();
     }
 
+    /**
+     * Gets all users from the repo
+     * @return the list of users
+     */
     public Iterable<User> getAllUsers() {
         return userRepository.findAll();
     }
 
+    /**
+     * Gets all friendships from the repo
+     * @return the list of friendships
+     */
     public Iterable<Friendship> getAllFriendships() {
         return friendshipRepository.findAll();
     }
 
+    /**
+     * Gets all messages from the repo
+     * @return the list of messages
+     */
     public Iterable<Message> getAllMessages() {
         return messageRepository.findAll();
     }
 
+    /**
+     * Adds a new user to the repo
+     * @param firstName the first name of the user
+     * @param lastName the last name of the user
+     * @return the newly created user if adding was successful
+     */
     public User addUser(String firstName, String lastName) {
         User user = new User(firstName, lastName);
         userValidator.validate(user);
@@ -58,6 +76,11 @@ public class Service {
         return user;
     }
 
+    /**
+     * Removes a user from the repo
+     * @param id the id of the user to be removed
+     * @return the removed user if operation successful
+     */
     public User removeUser(long id) {
         User user = userRepository.delete(id);
 
@@ -73,6 +96,12 @@ public class Service {
         return user;
     }
 
+    /**
+     * Adds a new friendship to the repo
+     * @param id1 the id of the first user from the friendship
+     * @param id2 the id of the second user from the friendship
+     * @return the newly created friendship if the operation was successful
+     */
     public Friendship addFriendship(long id1, long id2) {
         Friendship friendship = new Friendship(id1, id2);
         friendshipValidator.validate(friendship);
@@ -88,6 +117,11 @@ public class Service {
         return friendship;
     }
 
+    /**
+     * Removes a friendship from the repo
+     * @param id the id of the friendship to be removed
+     * @return the friendship that has been removed if the operation was successful
+     */
     public Friendship removeFriendship(long id) {
         Friendship friendship = friendshipRepository.delete(id);
 
@@ -98,6 +132,10 @@ public class Service {
         return friendship;
     }
 
+    /**
+     * Gets the number of communities with more than one user
+     * @return the number of communities
+     */
     public int getCommunitiesCount() {
         Map<Long, HashSet<Long>> adjMap = new HashMap<>();
         for (User user : getAllUsers()) {
@@ -115,6 +153,10 @@ public class Service {
         return graph.getConnectedComponentsCount();
     }
 
+    /**
+     * Gets the community with most users
+     * @return the users of the most sociable community
+     */
     public Iterable<User> getMostSociableCommunity() {
         Map<Long, HashSet<Long>> adjMap = new HashMap<>();
         for (User user : getAllUsers()) {
@@ -137,6 +179,11 @@ public class Service {
         return mostSociableNetwork;
     }
 
+    /**
+     * Gets all the friends of a user and the dates of the friendships
+     * @param id the id of the user whose friends will be returned
+     * @return the friends and friendship dates of the user
+     */
     public Map<User, LocalDateTime> getUserFriendships(long id) {
         Map<User, LocalDateTime> friends = new HashMap<>();
         Collection<Friendship> friendships = new ArrayList<>();
@@ -155,6 +202,11 @@ public class Service {
         return friends;
     }
 
+    /**
+     * Gets all the friends of a user and the dates of the friendships
+     * @param id the id of the user whose friends will be returned
+     * @return the friends and friendship dates of the user
+     */
     public Map<User, LocalDateTime> getUserFriendshipsInMonth(long id, int month) {
         Map<User, LocalDateTime> friends = new HashMap<>();
         Collection<Friendship> friendships = new ArrayList<>();
@@ -173,6 +225,13 @@ public class Service {
         return friends;
     }
 
+    /**
+     * Adds a message to the repo
+     * @param id the id of the user that sends the message
+     * @param to the ids of teh users that receive the message
+     * @param messageValue the message body
+     * @return the newly created message if the operation was successful
+     */
     public Message sendMessage(long id, List<Long> to, String messageValue) {
         Message message = new Message(id, to, messageValue);
         message.setReply(false);
@@ -195,6 +254,11 @@ public class Service {
         return message;
     }
 
+    /**
+     * Gets all conversations that implicate a user
+     * @param userId the id of the user that takes part in the conversations
+     * @return a list composed of the first message of each conversation
+     */
     public Iterable<Message> getConversations(long userId) {
         if (userRepository.findOne(userId) == null)
             throw new NotFoundException("nonexistent user");
@@ -212,6 +276,12 @@ public class Service {
         return conversations;
     }
 
+    /**
+     * Gets the messages of a conversation
+     * @param userId the id of the user that is taking part of the conversation
+     * @param conversationId the id of the first message of the conversation
+     * @return the list of messages of the conversation
+     */
     public Iterable<Message> getConversation(long userId, long conversationId) {
         if (userRepository.findOne(userId) == null)
             throw new ValidationException("invalid user");
@@ -230,6 +300,13 @@ public class Service {
         return conversation;
     }
 
+    /**
+     * Adds a message ro the repo as a reply to a message or another reply
+     * @param userId the id of the user taking part to the conversation
+     * @param replyToId the id of the message that is replying to
+     * @param messageValue the message body
+     * @return the newly created reply if the operation was successful
+     */
     public Message replyToMessage(long userId, long replyToId, String messageValue) {
         if (userRepository.findOne(userId) == null)
             throw new ValidationException("invalid user");
@@ -251,6 +328,12 @@ public class Service {
         return message;
     }
 
+    /**
+     * Adds a new friendship invite to the repo
+     * @param from the id of the user inviting
+     * @param to the id of the user being invited
+     * @return the newly created invite if the operation was successful
+     */
     public Invite sendInvite(long from, long to) {
         if (userRepository.findOne(from) == null ||
                 userRepository.findOne(to) == null ||
@@ -273,6 +356,11 @@ public class Service {
         return invite;
     }
 
+    /**
+     * Gets the invites implicating a user
+     * @param userId the id of the user taking part in the invite
+     * @return the list of invites
+     */
     public Iterable<Invite> getInvites(long userId) {
         Collection<Invite> invites = new ArrayList<>();
         for (Invite invite : inviteRepository.findAll())
@@ -281,7 +369,13 @@ public class Service {
         return invites;
     }
 
-    public void acceptInvite(long userId, long inviteId) {
+    /**
+     * Accepts an invite and adds a friendship between the two users of the invite
+     * @param userId the id of the user being invited
+     * @param inviteId the id of the invite being accepted
+     * @return the newly created friendship after accepting the invite if the operation was successful
+     */
+    public Friendship acceptInvite(long userId, long inviteId) {
         if (userRepository.findOne(userId) == null)
             throw new NotFoundException("nonexistent user");
         Invite invite = inviteRepository.findOne(inviteId);
@@ -292,10 +386,16 @@ public class Service {
             throw new ValidationException("invalid invite");
 
         invite.setStatus(InviteStatus.APPROVED);
-        addFriendship(invite.getFrom(), invite.getTo());
+        return addFriendship(invite.getFrom(), invite.getTo());
     }
 
-    public void rejectInvite(long userId, long inviteId) {
+    /**
+     * Rejects a invite
+     * @param userId the id of the user rejecting the invite
+     * @param inviteId the id of the invite being rejected
+     * @return the invite after being rejected if the operation was successful
+     */
+    public Invite rejectInvite(long userId, long inviteId) {
         if (userRepository.findOne(userId) == null)
             throw new NotFoundException("nonexistent user");
         Invite invite = inviteRepository.findOne(inviteId);
@@ -306,8 +406,12 @@ public class Service {
             throw new ValidationException("invalid invite");
 
         invite.setStatus(InviteStatus.REJECTED);
+        return invite;
     }
 
+    /**
+     * Closes the repositories. Acts like a destructor
+     */
     public void close() {
         userRepository.close();
         friendshipRepository.close();
