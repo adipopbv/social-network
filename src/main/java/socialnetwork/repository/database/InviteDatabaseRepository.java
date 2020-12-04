@@ -51,6 +51,17 @@ public class InviteDatabaseRepository extends AbstractDatabaseRepository<Long, I
     }
 
     @Override
+    protected void updateInDatabase(Invite entity) {
+        try {
+            statement.executeUpdate("update invites " +
+                    "set from_id = '" + entity.getFrom() + "', to_id = '" + entity.getTo() + "', status = '" + statusToString(entity.getStatus()) + "' " +
+                    "where invite_id = " + entity.getId() + ";");
+        } catch (Exception exception) {
+            throw new DatabaseException("could not update database");
+        }
+    }
+
+    @Override
     protected void updateDatabase() {
         try {
             ResultSet data = statement.executeQuery("select * from invites");
