@@ -213,15 +213,19 @@ public class TuiClient extends Client {
     }
 
     private void removeFriendship() {
+        System.out.print("User id: ");
+        String userId = scanner.nextLine();
         System.out.print("Friendship id: ");
-        String id = scanner.nextLine();
+        String friendshipId = scanner.nextLine();
         try {
-            Long.parseLong(id);
+            Long.parseLong(userId);
+            Long.parseLong(friendshipId);
         } catch (Exception e) {
-            id = "-1";
+            userId = "-1";
+            friendshipId = "-1";
         }
 
-        service.removeFriendship(Long.parseLong(id));
+        service.removeFriendship(Long.parseLong(userId), Long.parseLong(friendshipId));
     }
 
     private void getCommunitiesCount() {

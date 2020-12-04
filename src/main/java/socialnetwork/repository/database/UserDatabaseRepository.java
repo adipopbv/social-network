@@ -52,6 +52,17 @@ public class UserDatabaseRepository extends AbstractDatabaseRepository<Long, Use
     }
 
     @Override
+    protected void updateInDatabase(User entity) {
+        try {
+            statement.executeUpdate("update users " +
+                    "set first_name = '" + entity.getFirstName() + "', last_name = '" + entity.getLastName() + "', friends = '" + listToDbString(entity.getFriends()) + "' " +
+                    "where user_id = " + entity.getId() + ";");
+        } catch (Exception exception) {
+            throw new DatabaseException("could not update database");
+        }
+    }
+
+    @Override
     protected void updateDatabase() {
         try {
             ResultSet data = statement.executeQuery("select * from users");
