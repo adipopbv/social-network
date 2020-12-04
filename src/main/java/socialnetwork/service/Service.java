@@ -309,6 +309,7 @@ public class Service {
             message = messageRepository.findOne(message.getResponse());
             conversation.add(message);
         }
+
         return conversation;
     }
 
@@ -337,6 +338,8 @@ public class Service {
             message.setId((long) (random.nextInt(9000) + 1000));
         } while (messageRepository.save(message) != null);
         original.setResponse(message.getId());
+        messageRepository.update(original);
+
         return message;
     }
 
