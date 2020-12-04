@@ -1,6 +1,7 @@
 package socialnetwork.repository.database;
 
 import socialnetwork.domain.Message;
+import socialnetwork.domain.User;
 import socialnetwork.domain.exceptions.DatabaseException;
 import socialnetwork.domain.validators.Validator;
 
@@ -61,6 +62,17 @@ public class MessageDatabaseRepository extends AbstractDatabaseRepository<Long, 
             statement.executeUpdate("delete from messages where message_id = " + id + ";");
         } catch (Exception exception) {
             throw new DatabaseException("could not remove from database");
+        }
+    }
+
+    @Override
+    protected void updateInDatabase(Message entity) {
+        try {
+            statement.executeUpdate("update messages " +
+                    "set from_id = " + entity.getFrom() + ", to_ids = '" + listToDbString(entity.getTo()) + "', message_value = '" + entity.getMessage() + "', date = '" + Timestamp.valueOf(entity.getDate()) + "', response_id = " + ((entity.getResponse() == 0) ? "null" : entity.getResponse()) + ", is_reply = " + entity.isReply() + " " +
+                    "where message_id = " + entity.getId() + ";");
+        } catch (Exception exception) {
+            throw new DatabaseException("could not update database");
         }
     }
 
