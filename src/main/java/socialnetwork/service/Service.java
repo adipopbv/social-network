@@ -113,21 +113,33 @@ public class Service {
         User user1 = userRepository.findOne(id1), user2 = userRepository.findOne(id2);
         user1.getFriends().add(user2.getId());
         user2.getFriends().add(user1.getId());
+        userRepository.update(user1);
+        userRepository.update(user2);
 
         return friendship;
     }
 
     /**
      * Removes a friendship from the repo
-     * @param id the id of the friendship to be removed
+     * @param userId the id of the user removing the friendship
+     * @param friendshipId the id of the friendship to be removed
      * @return the friendship that has been removed if the operation was successful
      */
-    public Friendship removeFriendship(long id) {
-        Friendship friendship = friendshipRepository.delete(id);
+    public Friendship removeFriendship(long userId, long friendshipId) {
+        if (userRepository.findOne(userId) == null)
+            throw new ValidationException("invalid user");
+        if (friendshipRepository.findOne(friendshipId) == null ||
+                (friendshipRepository.findOne(friendshipId).getFriend1() != userId &&
+                friendshipRepository.findOne(friendshipId).getFriend2() != userId))
+            throw new ValidationException("invalid friendship");
+
+        Friendship friendship = friendshipRepository.delete(friendshipId);
 
         User user1 = userRepository.findOne(friendship.getFriend1()), user2 = userRepository.findOne(friendship.getFriend2());
         user1.getFriends().remove(user2.getId());
         user2.getFriends().remove(user1.getId());
+        userRepository.update(user1);
+        userRepository.update(user2);
 
         return friendship;
     }
@@ -344,7 +356,7 @@ public class Service {
         for (Invite invite : inviteRepository.findAll())
             if (((invite.getFrom() == from && invite.getTo() == to) ||
                     (invite.getFrom() == to && invite.getTo() == from)) &&
-                    invite.getStatus() != InviteStatus.REJECTED)
+                    invite.getStatus() == InviteStatus.PENDING)
                 throw new DuplicateException("users already trying to connect");
 
         Invite invite = new Invite(from, to);
@@ -386,6 +398,8 @@ public class Service {
             throw new ValidationException("invalid invite");
 
         invite.setStatus(InviteStatus.APPROVED);
+        inviteRepository.update(invite);
+
         return addFriendship(invite.getFrom(), invite.getTo());
     }
 
@@ -406,6 +420,8 @@ public class Service {
             throw new ValidationException("invalid invite");
 
         invite.setStatus(InviteStatus.REJECTED);
+        inviteRepository.update(invite);
+
         return invite;
     }
 

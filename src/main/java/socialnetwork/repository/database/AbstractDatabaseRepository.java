@@ -45,9 +45,19 @@ public abstract class AbstractDatabaseRepository<ID, E extends Entity<ID>> exten
         return e;
     }
 
+    @Override
+    public E update(E entity) {
+        E e = super.update(entity);
+        if (e != null)
+            updateInDatabase(entity);
+        return e;
+    }
+
     protected void addToDatabase (E entity) { }
 
     protected void removeFromDatabase (ID id) { }
+
+    protected void updateInDatabase (E entity) { }
 
     protected void updateDatabase() { }
 

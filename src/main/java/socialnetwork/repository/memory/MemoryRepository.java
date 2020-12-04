@@ -54,10 +54,6 @@ public class MemoryRepository<ID, E extends Entity<ID>> implements Repository<ID
             throw new IllegalArgumentException("entity must be not null!");
 
         entities.put(entity.getId(),entity);
-        if(entities.get(entity.getId()) != null) {
-            entities.put(entity.getId(),entity);
-            return null;
-        }
         return entity;
     }
 
