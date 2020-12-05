@@ -5,19 +5,21 @@ import socialnetwork.domain.Message;
 import socialnetwork.domain.User;
 import socialnetwork.domain.exceptions.SocialNetworkException;
 import socialnetwork.domain.exceptions.ValidationException;
-import socialnetwork.service.Service;
+import socialnetwork.service.SocialNetworkService;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class TuiClient extends Client {
-    public TuiClient(Service service) {
-        super(service);
+public class TuiClient implements SocialNetworkClient {
+    final SocialNetworkService service;
+
+    public TuiClient(SocialNetworkService service) {
+        this.service = service;
     }
 
     @Override
-    public void run() {
+    public void run(String[] args) {
         while (true) {
             try {
                 showMenu();

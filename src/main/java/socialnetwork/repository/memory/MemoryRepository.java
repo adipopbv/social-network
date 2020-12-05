@@ -19,7 +19,11 @@ public class MemoryRepository<ID, E extends Entity<ID>> implements Repository<ID
     public E findOne(ID id){
         if (id == null)
             throw new IllegalArgumentException("id must not be null");
-        return entities.get(id);
+//        try {
+            return entities.get(id);
+//        } catch (Exception e) {
+//            throw new NotFoundException("entity not found");
+//        }
     }
 
     @Override

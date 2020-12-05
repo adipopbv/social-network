@@ -15,8 +15,9 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Service {
+public class SocialNetworkService {
     private final Repository<Long, User> userRepository;
+    private final List<User> loggedInUsers = new ArrayList<>();
     private final Repository<Long, Friendship> friendshipRepository;
     private final Repository<Long, Message> messageRepository;
     private final Repository<Long, Invite> inviteRepository;
@@ -25,7 +26,7 @@ public class Service {
     private final MessageValidator messageValidator;
     private final InviteValidator inviteValidator;
 
-    public Service(Repository<Long, User> userRepository, Repository<Long, Friendship> friendshipRepository, Repository<Long, Message> messageRepository, Repository<Long, Invite> inviteRepository) {
+    public SocialNetworkService(Repository<Long, User> userRepository, Repository<Long, Friendship> friendshipRepository, Repository<Long, Message> messageRepository, Repository<Long, Invite> inviteRepository) {
         this.userRepository = userRepository;
         this.friendshipRepository = friendshipRepository;
         this.messageRepository = messageRepository;
@@ -34,6 +35,34 @@ public class Service {
         friendshipValidator = new FriendshipValidator();
         messageValidator = new MessageValidator();
         inviteValidator = new InviteValidator();
+    }
+
+    /**
+     * Logs in a user
+     * @param userId the id of the user to be logged in
+     * @return the user that logged in
+     */
+    public User logInUser(long userId) {
+        User user = userRepository.findOne(userId);
+        if (loggedInUsers.contains(user))
+            throw new DuplicateException("user already logged in");
+
+        loggedInUsers.add(user);
+        return user;
+    }
+
+    /**
+     * Logs out a user
+     * @param userId the id of the user to be logged out
+     * @return the user that logged out
+     */
+    public User logOutUser(long userId) {
+        User user = userRepository.findOne(userId);
+        if (!loggedInUsers.contains(user))
+            throw new NotFoundException("user not logged in");
+
+        loggedInUsers.remove(user);
+        return user;
     }
 
     /**
