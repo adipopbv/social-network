@@ -37,7 +37,7 @@ public class JavaFxClient extends Application implements SocialNetworkClient{
         AnchorPane root = loader.load();
 
         LogInWindowController controller = loader.getController();
-        controller.setService(service);
+        controller.init(service, null);
 
         primaryStage.setScene(new Scene(root, 700, 500));
         primaryStage.setTitle("Log In!");

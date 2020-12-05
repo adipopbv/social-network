@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="socialnetwork.ui.controllers.UserWindowController"
-            prefHeight="400.0" prefWidth="600.0">
-
+<AnchorPane prefHeight="444.0" prefWidth="471.0" style="-fx-background-color: grey;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="socialnetwork.ui.controllers.UserWindowController">
+    <children>
+        <Separator layoutX="35.0" layoutY="55.0" prefWidth="200.0" AnchorPane.leftAnchor="35.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="55.0" />
+        <Button fx:id="logOutUserButton" layoutX="14.0" layoutY="404.0" mnemonicParsing="false" onAction="#logOut" prefHeight="26.0" prefWidth="92.0" text="Log out" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" />
+        <Text fx:id="userWindowTitleText" fill="WHITE" layoutX="35.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="dummy" textAlignment="CENTER" wrappingWidth="401.0" AnchorPane.leftAnchor="35.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="13.620000839233398">
+            <font>
+                <Font name="Noto Sans Regular" size="20.0" />
+            </font>
+        </Text>
+    </children>
 </AnchorPane>

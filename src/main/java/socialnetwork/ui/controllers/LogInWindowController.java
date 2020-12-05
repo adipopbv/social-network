@@ -1,6 +1,5 @@
 package socialnetwork.ui.controllers;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -10,20 +9,19 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import socialnetwork.domain.User;
-import socialnetwork.service.SocialNetworkService;
 
 public class LogInWindowController extends AbstractWindowController {
 
     @FXML
-    public Button loginAcceptButton;
+    public Button logInAcceptButton;
     @FXML
-    public TextField loginUserIdField;
+    public TextField logInUserIdField;
     @FXML
-    public Button loginToSignUpButton;
+    public Button logInToSignUpButton;
 
-    public void logIn(ActionEvent actionEvent) throws Exception {
+    public void logIn() {
         try {
-            String userIdStr = loginUserIdField.getText();
+            String userIdStr = logInUserIdField.getText();
             long userId = Long.parseLong(userIdStr);
             User user = service.logInUser(userId);
 
@@ -32,7 +30,7 @@ public class LogInWindowController extends AbstractWindowController {
             AnchorPane root = loader.load();
 
             UserWindowController controller = loader.getController();
-            controller.setService(service);
+            controller.init(service, user);
 
             Stage stage = new Stage();
             stage.setScene(new Scene(root, 700, 500));
@@ -44,13 +42,13 @@ public class LogInWindowController extends AbstractWindowController {
         }
     }
 
-    public void toSignUp(ActionEvent actionEvent) throws Exception {
+    public void toSignUp() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("/view/signUpWindow.fxml"));
         AnchorPane root = loader.load();
 
         SignUpWindowController controller = loader.getController();
-        controller.setService(service);
+        controller.init(service, null);
 
         Stage stage = new Stage();
         stage.setScene(new Scene(root, 700, 500));
