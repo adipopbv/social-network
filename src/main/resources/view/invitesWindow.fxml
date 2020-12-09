@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="562.0" prefWidth="456.0" style="-fx-background-color: grey;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="socialnetwork.ui.controllers.InvitesWindowController">
+    <children>
+        <Text fill="WHITE" layoutX="35.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Invites" textAlignment="CENTER" wrappingWidth="431.0" AnchorPane.bottomAnchor="524.242000579834" AnchorPane.leftAnchor="35.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="13.757999420166016">
+            <font>
+                <Font name="Noto Sans Regular" size="18.0" />
+            </font>
+        </Text>
+        <Separator layoutX="35.0" layoutY="55.0" prefWidth="200.0" AnchorPane.leftAnchor="35.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="55.0" />
+        <TableView fx:id="toUsersTableView" layoutX="35.0" layoutY="90.0" prefHeight="197.0" prefWidth="431.0">
+            <columns>
+                <TableColumn fx:id="firstNameColumn" prefWidth="119.0" text="First name" />
+                <TableColumn fx:id="lastNameColumn" prefWidth="146.0" text="Last name" />
+            <TableColumn fx:id="statusColumn" prefWidth="165.0" text="Status" />
+            </columns>
+        </TableView>
+        <Button fx:id="acceptInviteButton" layoutX="35.0" layoutY="522.0" mnemonicParsing="false" onAction="#acceptInvite" prefHeight="26.0" prefWidth="209.0" text="Accept" textAlignment="CENTER" AnchorPane.leftAnchor="35.0" AnchorPane.rightAnchor="257.0" />
+      <TableView fx:id="fromUsersTableView" layoutX="35.0" layoutY="316.0" prefHeight="197.0" prefWidth="431.0">
+         <columns>
+            <TableColumn fx:id="firstNameColumn1" prefWidth="127.0" text="First name" />
+            <TableColumn fx:id="lastNameColumn1" prefWidth="140.0" text="Last name" />
+            <TableColumn fx:id="statusColumn1" prefWidth="165.0" text="Status" />
+         </columns>
+      </TableView>
+      <Text fill="WHITE" layoutX="35.0" layoutY="77.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sent" wrappingWidth="431.0" AnchorPane.leftAnchor="35.0" AnchorPane.rightAnchor="35.0">
+         <font>
+            <Font name="Noto Sans Regular" size="18.0" />
+         </font>
+      </Text>
+      <Text fill="WHITE" layoutX="35.0" layoutY="306.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Received" wrappingWidth="431.0" AnchorPane.leftAnchor="35.0" AnchorPane.rightAnchor="35.0">
+         <font>
+            <Font name="Noto Sans Regular" size="18.0" />
+         </font>
+      </Text>
+      <Button fx:id="rejectInviteButton" layoutX="257.0" layoutY="522.0" mnemonicParsing="false" onAction="#rejectInvite" prefHeight="26.0" prefWidth="209.0" text="Reject" textAlignment="CENTER" AnchorPane.leftAnchor="257.0" AnchorPane.rightAnchor="35.0" />
+    </children>
+</AnchorPane>

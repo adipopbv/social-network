@@ -10,13 +10,16 @@ import socialnetwork.domain.validators.InviteValidator;
 import socialnetwork.domain.validators.MessageValidator;
 import socialnetwork.domain.validators.UserValidator;
 import socialnetwork.repository.Repository;
+import socialnetwork.utils.observers.Observable;
+import socialnetwork.utils.observers.Observer;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Service {
+public class SocialNetworkService implements Observable {
     private final Repository<Long, User> userRepository;
+    private final List<User> loggedInUsers = new ArrayList<>();
     private final Repository<Long, Friendship> friendshipRepository;
     private final Repository<Long, Message> messageRepository;
     private final Repository<Long, Invite> inviteRepository;
@@ -25,7 +28,7 @@ public class Service {
     private final MessageValidator messageValidator;
     private final InviteValidator inviteValidator;
 
-    public Service(Repository<Long, User> userRepository, Repository<Long, Friendship> friendshipRepository, Repository<Long, Message> messageRepository, Repository<Long, Invite> inviteRepository) {
+    public SocialNetworkService(Repository<Long, User> userRepository, Repository<Long, Friendship> friendshipRepository, Repository<Long, Message> messageRepository, Repository<Long, Invite> inviteRepository) {
         this.userRepository = userRepository;
         this.friendshipRepository = friendshipRepository;
         this.messageRepository = messageRepository;
@@ -37,18 +40,54 @@ public class Service {
     }
 
     /**
+     * Logs in a user
+     * @param userId the id of the user to be logged in
+     * @return the user that logged in
+     */
+    public User logInUser(long userId) {
+        User user = userRepository.findOne(userId);
+        if (loggedInUsers.contains(user))
+            throw new DuplicateException("user already logged in");
+
+        loggedInUsers.add(user);
+        return user;
+    }
+
+    /**
+     * Logs out a user
+     * @param userId the id of the user to be logged out
+     * @return the user that logged out
+     */
+    public User logOutUser(long userId) {
+        User user = userRepository.findOne(userId);
+        if (!loggedInUsers.contains(user))
+            throw new NotFoundException("user not logged in");
+
+        loggedInUsers.remove(user);
+        return user;
+    }
+
+    /**
      * Gets all users from the repo
      * @return the list of users
      */
-    public Iterable<User> getAllUsers() {
+    public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    /**
+     * Gets a user from the repo
+     * @return the user
+     */
+    public User getUser(Long userId) {
+        return userRepository.findOne(userId);
     }
 
     /**
      * Gets all friendships from the repo
      * @return the list of friendships
      */
-    public Iterable<Friendship> getAllFriendships() {
+    public List<Friendship> getAllFriendships() {
         return friendshipRepository.findAll();
     }
 
@@ -56,8 +95,16 @@ public class Service {
      * Gets all messages from the repo
      * @return the list of messages
      */
-    public Iterable<Message> getAllMessages() {
+    public List<Message> getAllMessages() {
         return messageRepository.findAll();
+    }
+
+    /**
+     * Gets all invites from the repo
+     * @return the list of invites
+     */
+    public List<Invite> getAllInvites() {
+        return inviteRepository.findAll();
     }
 
     /**
@@ -73,6 +120,8 @@ public class Service {
         do {
             user.setId((long) (random.nextInt(9000) + 1000));
         } while (userRepository.save(user) != null);
+
+        notifyObservers();
         return user;
     }
 
@@ -93,6 +142,7 @@ public class Service {
         for (User userSearch : userRepository.findAll())
             userSearch.getFriends().remove(id);
 
+        notifyObservers();
         return user;
     }
 
@@ -116,6 +166,7 @@ public class Service {
         userRepository.update(user1);
         userRepository.update(user2);
 
+        notifyObservers();
         return friendship;
     }
 
@@ -141,6 +192,7 @@ public class Service {
         userRepository.update(user1);
         userRepository.update(user2);
 
+        notifyObservers();
         return friendship;
     }
 
@@ -198,10 +250,7 @@ public class Service {
      */
     public Map<User, LocalDateTime> getUserFriendships(long id) {
         Map<User, LocalDateTime> friends = new HashMap<>();
-        Collection<Friendship> friendships = new ArrayList<>();
-        for (Friendship friendship : friendshipRepository.findAll()) {
-            friendships.add(friendship);
-        }
+        Collection<Friendship> friendships = new ArrayList<>(friendshipRepository.findAll());
 
         friendships = friendships.stream()
                 .filter(fr -> fr.getFriend1() == id || fr.getFriend2() == id)
@@ -221,10 +270,7 @@ public class Service {
      */
     public Map<User, LocalDateTime> getUserFriendshipsInMonth(long id, int month) {
         Map<User, LocalDateTime> friends = new HashMap<>();
-        Collection<Friendship> friendships = new ArrayList<>();
-        for (Friendship friendship : friendshipRepository.findAll()) {
-            friendships.add(friendship);
-        }
+        Collection<Friendship> friendships = new ArrayList<>(friendshipRepository.findAll());
 
         friendships = friendships.stream()
                 .filter(fr -> (fr.getFriend1() == id || fr.getFriend2() == id) && fr.getDate().getMonth().getValue() == month)
@@ -263,6 +309,8 @@ public class Service {
         do {
             message.setId((long) (random.nextInt(9000) + 1000));
         } while (messageRepository.save(message) != null);
+
+        notifyObservers();
         return message;
     }
 
@@ -275,9 +323,7 @@ public class Service {
         if (userRepository.findOne(userId) == null)
             throw new NotFoundException("nonexistent user");
 
-        Collection<Message> conversations = new ArrayList<>();
-        for (Message message : messageRepository.findAll())
-            conversations.add(message);
+        Collection<Message> conversations = new ArrayList<>(messageRepository.findAll());
         conversations = conversations.stream()
                 .filter(conversation ->
                         (conversation.getFrom().equals(userId) ||
@@ -340,6 +386,7 @@ public class Service {
         original.setResponse(message.getId());
         messageRepository.update(original);
 
+        notifyObservers();
         return message;
     }
 
@@ -368,6 +415,8 @@ public class Service {
         do {
             invite.setId((long) (random.nextInt(9000) + 1000));
         } while (inviteRepository.save(invite) != null);
+
+        notifyObservers();
         return invite;
     }
 
@@ -376,8 +425,8 @@ public class Service {
      * @param userId the id of the user taking part in the invite
      * @return the list of invites
      */
-    public Iterable<Invite> getInvites(long userId) {
-        Collection<Invite> invites = new ArrayList<>();
+    public List<Invite> getInvites(long userId) {
+        List<Invite> invites = new ArrayList<>();
         for (Invite invite : inviteRepository.findAll())
             if (invite.getFrom() == userId || invite.getTo() == userId)
                 invites.add(invite);
@@ -403,6 +452,7 @@ public class Service {
         invite.setStatus(InviteStatus.APPROVED);
         inviteRepository.update(invite);
 
+        notifyObservers();
         return addFriendship(invite.getFrom(), invite.getTo());
     }
 
@@ -425,7 +475,36 @@ public class Service {
         invite.setStatus(InviteStatus.REJECTED);
         inviteRepository.update(invite);
 
+        notifyObservers();
         return invite;
+    }
+
+    public List<User> getFriends(long userId) {
+        if (userRepository.findOne(userId) == null)
+            throw new NotFoundException("nonexistent user");
+
+        User user = userRepository.findOne(userId);
+        List<User> friends = new ArrayList<>();
+        for (Long friendId : user.getFriends()) {
+            friends.add(userRepository.findOne(friendId));
+        }
+        return friends;
+    }
+
+    public void removeFriend(long userId, long friendId) {
+        if (userRepository.findOne(userId) == null ||
+                userRepository.findOne(friendId) == null)
+            throw new NotFoundException("nonexistent user");
+
+        for (Friendship friendship : friendshipRepository.findAll()) {
+            if ((friendship.getFriend1() == userId && friendship.getFriend2() == friendId) ||
+                    (friendship.getFriend1() == friendId && friendship.getFriend2() == userId)) {
+                removeFriendship(userId, friendship.getId());
+                break;
+            }
+        }
+
+        notifyObservers();
     }
 
     /**
@@ -436,5 +515,20 @@ public class Service {
         friendshipRepository.close();
         messageRepository.close();
         inviteRepository.close();
+    }
+
+    @Override
+    public void addObserver(Observer observer) {
+        observers.add(observer);
+    }
+
+    @Override
+    public void removeObserver(Observer observer) {
+        observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers() {
+        observers.forEach(Observer::update);
     }
 }

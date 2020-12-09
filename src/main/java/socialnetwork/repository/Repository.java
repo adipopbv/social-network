@@ -3,6 +3,8 @@ package socialnetwork.repository;
 import socialnetwork.domain.Entity;
 import socialnetwork.domain.exceptions.ValidationException;
 
+import java.util.List;
+
 /**
  * CRUD operations repository interface
  * @param <ID> - type E must have an attribute of type ID
@@ -26,7 +28,7 @@ public interface Repository<ID, E extends Entity<ID>> {
      *
      * @return all entities
      */
-    Iterable<E> findAll();
+    List<E> findAll();
 
     /**
      *

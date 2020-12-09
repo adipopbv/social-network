@@ -2,11 +2,9 @@ package socialnetwork.repository.memory;
 
 import socialnetwork.domain.Entity;
 import socialnetwork.domain.exceptions.NotFoundException;
-import socialnetwork.domain.validators.Validator;
 import socialnetwork.repository.Repository;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class MemoryRepository<ID, E extends Entity<ID>> implements Repository<ID,E> {
     protected Map<ID,E> entities;
@@ -19,12 +17,16 @@ public class MemoryRepository<ID, E extends Entity<ID>> implements Repository<ID
     public E findOne(ID id){
         if (id == null)
             throw new IllegalArgumentException("id must not be null");
-        return entities.get(id);
+//        try {
+            return entities.get(id);
+//        } catch (Exception e) {
+//            throw new NotFoundException("entity not found");
+//        }
     }
 
     @Override
-    public Iterable<E> findAll() {
-        return entities.values();
+    public List<E> findAll() {
+        return new ArrayList<>(entities.values());
     }
 
     @Override
