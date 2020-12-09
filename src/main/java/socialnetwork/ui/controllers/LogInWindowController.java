@@ -55,4 +55,9 @@ public class LogInWindowController extends AbstractWindowController {
         stage.setTitle("Sign Up!");
         stage.show();
     }
+
+    @Override
+    public void update() {
+
+    }
 }

@@ -22,7 +22,7 @@ public class SignUpWindowController extends AbstractWindowController {
     public void signUp() {
         try {
             String firstName = signUpFirstNameField.getText();
-            String lastName = signUpFirstNameField.getText();
+            String lastName = signUpLastNameField.getText();
 
             User user = service.addUser(firstName, lastName);
             service.logInUser(user.getId());
@@ -44,6 +44,11 @@ public class SignUpWindowController extends AbstractWindowController {
             Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
             alert.show();
         }
+
+    }
+
+    @Override
+    public void update() {
 
     }
 }

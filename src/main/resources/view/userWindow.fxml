@@ -7,11 +7,20 @@
 <AnchorPane prefHeight="444.0" prefWidth="471.0" style="-fx-background-color: grey;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="socialnetwork.ui.controllers.UserWindowController">
     <children>
         <Separator layoutX="35.0" layoutY="55.0" prefWidth="200.0" AnchorPane.leftAnchor="35.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="55.0" />
-        <Button fx:id="logOutUserButton" layoutX="14.0" layoutY="404.0" mnemonicParsing="false" onAction="#logOut" prefHeight="26.0" prefWidth="92.0" text="Log out" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" />
+        <Button fx:id="logOutUserButton" layoutX="35.0" layoutY="453.0" mnemonicParsing="false" onAction="#logOut" prefHeight="26.0" prefWidth="92.0" text="Log out" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="35.0" />
         <Text fx:id="userWindowTitleText" fill="WHITE" layoutX="35.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="dummy" textAlignment="CENTER" wrappingWidth="401.0" AnchorPane.leftAnchor="35.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="13.620000839233398">
             <font>
                 <Font name="Noto Sans Regular" size="20.0" />
             </font>
         </Text>
+      <TableView fx:id="userFriendsTableView" layoutX="35.0" layoutY="79.0" prefHeight="311.0" prefWidth="272.0">
+        <columns>
+          <TableColumn fx:id="firstNameColumn" prefWidth="132.0" text="First name" />
+          <TableColumn fx:id="lastNameColumn" prefWidth="139.0" text="Last name" />
+        </columns>
+      </TableView>
+      <Button fx:id="listAllUsersButton" layoutX="329.0" layoutY="79.0" mnemonicParsing="false" onAction="#openAllUsersWindow" prefHeight="26.0" prefWidth="107.0" text="List all users" AnchorPane.leftAnchor="329.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="79.0" />
+      <Button fx:id="removeFriendButton" layoutX="329.0" layoutY="127.0" mnemonicParsing="false" onAction="#removeFriend" prefHeight="48.0" prefWidth="107.0" text="Remove friend" textAlignment="CENTER" wrapText="true" AnchorPane.leftAnchor="329.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="127.0" />
+      <Button fx:id="listInvitesButton" layoutX="329.0" layoutY="197.0" mnemonicParsing="false" onAction="#openInvitesWindow" prefHeight="26.0" prefWidth="107.0" text="See invites" textAlignment="CENTER" AnchorPane.leftAnchor="329.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="197.0" />
     </children>
 </AnchorPane>
