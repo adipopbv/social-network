@@ -5,6 +5,8 @@ import socialnetwork.domain.InviteStatus;
 import socialnetwork.domain.exceptions.DatabaseException;
 
 import java.sql.ResultSet;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 public class InviteDatabaseRepository extends AbstractDatabaseRepository<Long, Invite> {
     public InviteDatabaseRepository(String url, String user, String password) {
@@ -20,7 +22,8 @@ public class InviteDatabaseRepository extends AbstractDatabaseRepository<Long, I
                 long from = data.getInt("from_id");
                 long to = data.getInt("to_id");
                 InviteStatus status = stringToStatus(data.getString("status"));
-                Invite invite = new Invite(from, to, status);
+                LocalDateTime date = data.getTimestamp("date").toLocalDateTime();
+                Invite invite = new Invite(from, to, status, date);
                 invite.setId(id);
 
                 entities.putIfAbsent(invite.getId(), invite);
@@ -34,8 +37,8 @@ public class InviteDatabaseRepository extends AbstractDatabaseRepository<Long, I
     @Override
     protected void addToDatabase(Invite entity) {
         try {
-            statement.executeUpdate("insert into invites(invite_id, from_id, to_id, status) " +
-                    "values (" + entity.getId() + ", " + entity.getFrom() + ", " + entity.getTo() + ", '" + statusToString(entity.getStatus()) + "');");
+            statement.executeUpdate("insert into invites(invite_id, from_id, to_id, status, date) " +
+                    "values (" + entity.getId() + ", " + entity.getFrom() + ", " + entity.getTo() + ", '" + statusToString(entity.getStatus()) + "', '" + Timestamp.valueOf(entity.getDate()) + "');");
         } catch (Exception exception) {
             throw new DatabaseException("could not add to database");
         }

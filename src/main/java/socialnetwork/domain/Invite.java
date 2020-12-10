@@ -1,21 +1,25 @@
 package socialnetwork.domain;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Invite extends Entity<Long> {
     private final Long from;
     private final Long to;
     private InviteStatus status = InviteStatus.PENDING;
+    private final LocalDateTime date;
 
     public Invite(Long from, Long to) {
         this.from = from;
         this.to = to;
+        date = LocalDateTime.now();
     }
 
-    public Invite(Long from, Long to, InviteStatus status) {
+    public Invite(Long from, Long to, InviteStatus status, LocalDateTime date) {
         this.from = from;
         this.to = to;
         this.status = status;
+        this.date = date;
     }
 
     public Long getFrom() {
@@ -32,6 +36,10 @@ public class Invite extends Entity<Long> {
 
     public void setStatus(InviteStatus status) {
         this.status = status;
+    }
+
+    public LocalDateTime getDate() {
+        return date;
     }
 
     @Override
