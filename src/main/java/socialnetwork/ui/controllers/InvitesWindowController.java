@@ -86,9 +86,9 @@ public class InvitesWindowController extends AbstractWindowController {
         try {
             if (fromUsersTableView.getSelectionModel().getSelectedItem() != null) {
                 service.acceptInvite(loggedUser.getId(), fromUsersTableView.getSelectionModel().getSelectedItem().getInvite().getId());
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Operation successful!");
+                alert.show();
             }
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Operation successful!");
-            alert.show();
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
             alert.show();
@@ -99,9 +99,13 @@ public class InvitesWindowController extends AbstractWindowController {
         try {
             if (fromUsersTableView.getSelectionModel().getSelectedItem() != null) {
                 service.rejectInvite(loggedUser.getId(), fromUsersTableView.getSelectionModel().getSelectedItem().getInvite().getId());
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Operation successful!");
+                alert.show();
+            } else if (toUsersTableView.getSelectionModel().getSelectedItem() != null) {
+                service.rejectInvite(loggedUser.getId(), toUsersTableView.getSelectionModel().getSelectedItem().getInvite().getId());
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Operation successful!");
+                alert.show();
             }
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Operation successful!");
-            alert.show();
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
             alert.show();
