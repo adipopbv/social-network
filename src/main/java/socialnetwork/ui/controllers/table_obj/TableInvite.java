@@ -7,6 +7,7 @@ public class TableInvite {
     private final String firstName;
     private final String lastName;
     private final String status;
+    private final String date;
     private final Invite invite;
 
     public String getFirstName() {
@@ -19,6 +20,10 @@ public class TableInvite {
 
     public String getStatus() {
         return status;
+    }
+
+    public String getDate() {
+        return date;
     }
 
     public Invite getInvite() {
@@ -35,5 +40,6 @@ public class TableInvite {
             case REJECTED: status = "REJECTED"; break;
             default: status = null; break;
         }
+        date = invite.getDate().toString();
     }
 }

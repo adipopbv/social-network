@@ -30,6 +30,8 @@ public class InvitesWindowController extends AbstractWindowController {
     @FXML
     public TableColumn<TableInvite, String> statusColumn;
     @FXML
+    public TableColumn<TableInvite, String> dateColumn;
+    @FXML
     public TableView<TableInvite> fromUsersTableView;
     @FXML
     public TableColumn<TableInvite, String> firstNameColumn1;
@@ -37,6 +39,8 @@ public class InvitesWindowController extends AbstractWindowController {
     public TableColumn<TableInvite, String> lastNameColumn1;
     @FXML
     public TableColumn<TableInvite, String> statusColumn1;
+    @FXML
+    public TableColumn<TableInvite, String> dateColumn1;
     @FXML
     public Button acceptInviteButton;
     @FXML
@@ -47,9 +51,11 @@ public class InvitesWindowController extends AbstractWindowController {
         firstNameColumn.setCellValueFactory(new PropertyValueFactory<TableInvite, String>("firstName"));
         lastNameColumn.setCellValueFactory(new PropertyValueFactory<TableInvite, String>("lastName"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<TableInvite, String>("status"));
+        dateColumn.setCellValueFactory(new PropertyValueFactory<TableInvite, String>("date"));
         firstNameColumn1.setCellValueFactory(new PropertyValueFactory<TableInvite, String>("firstName"));
         lastNameColumn1.setCellValueFactory(new PropertyValueFactory<TableInvite, String>("lastName"));
         statusColumn1.setCellValueFactory(new PropertyValueFactory<TableInvite, String>("status"));
+        dateColumn1.setCellValueFactory(new PropertyValueFactory<TableInvite, String>("date"));
         toUsersTableView.setItems(toUsers);
         fromUsersTableView.setItems(fromUsers);
     }
@@ -80,9 +86,9 @@ public class InvitesWindowController extends AbstractWindowController {
         try {
             if (fromUsersTableView.getSelectionModel().getSelectedItem() != null) {
                 service.acceptInvite(loggedUser.getId(), fromUsersTableView.getSelectionModel().getSelectedItem().getInvite().getId());
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Operation successful!");
+                alert.show();
             }
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Operation successful!");
-            alert.show();
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
             alert.show();
@@ -93,9 +99,13 @@ public class InvitesWindowController extends AbstractWindowController {
         try {
             if (fromUsersTableView.getSelectionModel().getSelectedItem() != null) {
                 service.rejectInvite(loggedUser.getId(), fromUsersTableView.getSelectionModel().getSelectedItem().getInvite().getId());
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Operation successful!");
+                alert.show();
+            } else if (toUsersTableView.getSelectionModel().getSelectedItem() != null) {
+                service.rejectInvite(loggedUser.getId(), toUsersTableView.getSelectionModel().getSelectedItem().getInvite().getId());
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Operation successful!");
+                alert.show();
             }
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Operation successful!");
-            alert.show();
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
             alert.show();
