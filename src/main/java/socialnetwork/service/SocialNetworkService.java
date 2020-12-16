@@ -319,11 +319,11 @@ public class SocialNetworkService implements Observable {
      * @param userId the id of the user that takes part in the conversations
      * @return a list composed of the first message of each conversation
      */
-    public Iterable<Message> getConversations(long userId) {
+    public List<Message> getConversations(long userId) {
         if (userRepository.findOne(userId) == null)
             throw new NotFoundException("nonexistent user");
 
-        Collection<Message> conversations = new ArrayList<>(messageRepository.findAll());
+        List<Message> conversations = new ArrayList<>(messageRepository.findAll());
         conversations = conversations.stream()
                 .filter(conversation ->
                         (conversation.getFrom().equals(userId) ||
@@ -340,7 +340,7 @@ public class SocialNetworkService implements Observable {
      * @param conversationId the id of the first message of the conversation
      * @return the list of messages of the conversation
      */
-    public Iterable<Message> getConversation(long userId, long conversationId) {
+    public List<Message> getConversation(long userId, long conversationId) {
         if (userRepository.findOne(userId) == null)
             throw new ValidationException("invalid user");
         if (messageRepository.findOne(conversationId) == null ||

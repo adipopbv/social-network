@@ -13,7 +13,7 @@ import socialnetwork.service.SocialNetworkService;
 
 import java.util.List;
 
-public class AllUsersWindowController extends AbstractWindowController {
+public class AllUsersInviteWindowController extends AbstractWindowController {
     ObservableList<User> users = FXCollections.observableArrayList();
 
     @FXML

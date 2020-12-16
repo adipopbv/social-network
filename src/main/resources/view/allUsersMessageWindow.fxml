@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="482.0" prefWidth="396.0" style="-fx-background-color: grey;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="socialnetwork.ui.controllers.AllUsersMessageWindowController">
+    <children>
+        <Text fill="WHITE" layoutX="35.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Send new message" textAlignment="CENTER" wrappingWidth="326.4240036010742" AnchorPane.bottomAnchor="444.242000579834" AnchorPane.leftAnchor="35.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="13.757999420166016">
+            <font>
+                <Font name="Noto Sans Regular" size="18.0" />
+            </font>
+        </Text>
+        <Separator layoutX="35.0" layoutY="55.0" prefWidth="200.0" AnchorPane.leftAnchor="35.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="55.0" />
+        <TableView fx:id="usersTableView" layoutX="35.0" layoutY="79.0" prefHeight="302.0" prefWidth="326.0" AnchorPane.leftAnchor="35.0" AnchorPane.rightAnchor="35.42400360107422">
+            <columns>
+                <TableColumn fx:id="firstNameColumn" prefWidth="165.0" text="First name" />
+                <TableColumn fx:id="lastNameColumn" prefWidth="160.0" text="Last name" />
+            </columns>
+        </TableView>
+        <Button fx:id="sendMessageButton" layoutX="146.0" layoutY="443.0" mnemonicParsing="false" onAction="#sendMessage" prefHeight="26.0" prefWidth="105.0" text="Send" textAlignment="CENTER" AnchorPane.bottomAnchor="13.516000747680664" AnchorPane.leftAnchor="146.0" AnchorPane.rightAnchor="145.42400360107422" AnchorPane.topAnchor="443.0" />
+      <TextField fx:id="messageTextField" layoutX="35.0" layoutY="400.0" prefHeight="26.0" prefWidth="326.0" promptText="message" AnchorPane.leftAnchor="35.0" AnchorPane.rightAnchor="35.42400360107422" />
+    </children>
+
+</AnchorPane>
