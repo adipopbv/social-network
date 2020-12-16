@@ -21,7 +21,7 @@ public class JavaFxClient extends Application implements SocialNetworkClient{
     final SocialNetworkService service;
 
     public JavaFxClient() {
-        String dbUrl = "jdbc:postgresql://localhost:5432/social_network";
+        String dbUrl = "jdbc:postgresql://localhost:5432/socialnetwork";
         String user = "adipopbv", password = "adipopbv";
         Repository<Long, User> userRepository = new UserDatabaseRepository(dbUrl, user, password);
         Repository<Long, Friendship> friendshipRepository = new FriendshipDatabaseRepository(dbUrl, user, password);
@@ -39,7 +39,7 @@ public class JavaFxClient extends Application implements SocialNetworkClient{
         LogInWindowController controller = loader.getController();
         controller.init(service, null);
 
-        primaryStage.setScene(new Scene(root, 700, 500));
+        primaryStage.setScene(new Scene(root, 270, 355));
         primaryStage.setTitle("Log In!");
         primaryStage.show();
     }

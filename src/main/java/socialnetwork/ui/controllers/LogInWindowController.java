@@ -33,7 +33,7 @@ public class LogInWindowController extends AbstractWindowController {
             controller.init(service, user);
 
             Stage stage = new Stage();
-            stage.setScene(new Scene(root, 700, 500));
+            stage.setScene(new Scene(root, 471, 444));
             stage.setTitle(user.getFirstName() + " " + user.getLastName() + "'s home window");
             stage.show();
         } catch (Exception e) {
@@ -51,7 +51,7 @@ public class LogInWindowController extends AbstractWindowController {
         controller.init(service, null);
 
         Stage stage = new Stage();
-        stage.setScene(new Scene(root, 700, 500));
+        stage.setScene(new Scene(root, 270, 355));
         stage.setTitle("Sign Up!");
         stage.show();
     }

@@ -64,7 +64,7 @@ public class UserWindowController extends AbstractWindowController {
             controller.init(service, loggedUser);
 
             Stage stage = new Stage();
-            stage.setScene(new Scene(root, 700, 500));
+            stage.setScene(new Scene(root, 396, 482));
             stage.setTitle("All social network users");
             stage.show();
 
@@ -90,7 +90,7 @@ public class UserWindowController extends AbstractWindowController {
             controller.init(service, loggedUser);
 
             Stage stage = new Stage();
-            stage.setScene(new Scene(root, 700, 500));
+            stage.setScene(new Scene(root, 592, 560));
             stage.setTitle("All user invites");
             stage.show();
 
