@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
 
-public class User extends Entity<Long>{
+public class User extends Entity {
     private String firstName;
     private String lastName;
     private final List<Long> friends;

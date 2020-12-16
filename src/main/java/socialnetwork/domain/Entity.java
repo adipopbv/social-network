@@ -2,14 +2,14 @@ package socialnetwork.domain;
 
 import java.io.Serializable;
 
-public class Entity<ID> implements Serializable {
+public class Entity implements Serializable {
+//    private static final long serialVersionUID = 7331115341259248461L;
+    private Id id;
 
-    private static final long serialVersionUID = 7331115341259248461L;
-    private ID id;
-    public ID getId() {
+    public Id getId() {
         return id;
     }
-    public void setId(ID id) {
+    public void setId(Id id) {
         this.id = id;
     }
 }

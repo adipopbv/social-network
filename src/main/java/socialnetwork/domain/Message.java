@@ -4,70 +4,96 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
-public class Message extends Entity<Long> {
-    private final Long from;
-    private final List<Long> to;
-    private final String message;
+public class Message extends Entity {
+    private final User from;
+    private final List<User> to;
+    private final String text;
     private final LocalDateTime date;
-    private long response;
-    private boolean isReply = true;
-//    private Message original;
+    private final Message response;
+    private final Message original;
 
-    public Message(Long from, List<Long> to, String message) {
+    public Message(User from, List<User> to, String text) {
         this.from = from;
         this.to = to;
-        this.message = message;
+        this.text = text;
         this.date = LocalDateTime.now();
-        this.response = 0;
+        this.response = null;
+        this.original = null;
     }
 
-    public Message(Long from, List<Long> to, String message, Long response) {
+    public Message(User from, List<User> to, String text, Message response) {
         this.from = from;
         this.to = to;
-        this.message = message;
+        this.text = text;
         this.date = LocalDateTime.now();
         this.response = response;
+        this.original = null;
     }
 
-    public Message(Long from, List<Long> to, String message, LocalDateTime date, Long response, Boolean isReply) {
+    public Message(User from, List<User> to, String text, Message original) {
         this.from = from;
         this.to = to;
-        this.message = message;
+        this.text = text;
+        this.date = LocalDateTime.now();
+        this.response = null;
+        this.original = original;
+    }
+
+    public Message(User from, List<User> to, String text, LocalDateTime date, Message response, Message original) {
+        this.from = from;
+        this.to = to;
+        this.text = text;
         this.date = date;
         this.response = response;
-        this.isReply = isReply;
+        this.original = original;
     }
 
-    public Long getFrom() {
+    public User getFrom() {
         return from;
     }
 
-    public List<Long> getTo() {
+    public Long getFromId() {
+        return getFrom().getId().getValue();
+    }
+
+    public List<User> getTo() {
         return to;
     }
 
-    public String getMessage() {
-        return message;
+    public String getText() {
+        return text;
     }
 
     public LocalDateTime getDate() {
         return date;
     }
 
-    public Long getResponse() {
+    public Message getResponse() {
         return response;
+    }
+
+    public Long getResponseId() {
+        return getResponse().getId();
     }
 
     public void setResponse(long response) {
         this.response = response;
     }
 
-    public boolean isReply() {
-        return isReply;
+    public Message getOriginal() {
+        return original;
     }
 
-    public void setReply(boolean reply) {
-        isReply = reply;
+    public Long getOriginalId() {
+        return original.getId();
+    }
+
+    public void setOriginal(Message original) {
+        this.original = original;
+    }
+
+    public void setOriginalId(Long originalId) {
+        this.getOriginal().setId(originalId);
     }
 
     @Override
@@ -98,12 +124,4 @@ public class Message extends Entity<Long> {
     public int hashCode() {
         return Objects.hash(getFrom(), getTo(), getMessage(), getDate(), getMessage(), getResponse());
     }
-//
-//    public Message getOriginal() {
-//        return original;
-//    }
-//
-//    public void setOriginal(Message original) {
-//        this.original = original;
-//    }
 }
