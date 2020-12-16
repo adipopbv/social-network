@@ -33,6 +33,7 @@ public class AllUsersMessageWindowController extends AbstractWindowController {
         firstNameColumn.setCellValueFactory(new PropertyValueFactory<User, String>("firstName"));
         lastNameColumn.setCellValueFactory(new PropertyValueFactory<User, String>("lastName"));
         usersTableView.setItems(users);
+        usersTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
 
     @Override
@@ -46,8 +47,6 @@ public class AllUsersMessageWindowController extends AbstractWindowController {
                 List<Long> usersIds = usersTableView.getSelectionModel().getSelectedItems().stream().map(Entity::getId).collect(Collectors.toList());
                 service.sendMessage(loggedUser.getId(), usersIds, messageTextField.getText());
             }
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Operation successful!");
-            alert.show();
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
             alert.show();

@@ -11,6 +11,7 @@ public class Message extends Entity<Long> {
     private final LocalDateTime date;
     private long response;
     private boolean isReply = true;
+//    private Message original;
 
     public Message(Long from, List<Long> to, String message) {
         this.from = from;
@@ -97,4 +98,12 @@ public class Message extends Entity<Long> {
     public int hashCode() {
         return Objects.hash(getFrom(), getTo(), getMessage(), getDate(), getMessage(), getResponse());
     }
+//
+//    public Message getOriginal() {
+//        return original;
+//    }
+//
+//    public void setOriginal(Message original) {
+//        this.original = original;
+//    }
 }

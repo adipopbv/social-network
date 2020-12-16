@@ -19,36 +19,41 @@ import javafx.stage.Stage;
 import socialnetwork.domain.Message;
 import socialnetwork.domain.User;
 import socialnetwork.service.SocialNetworkService;
+import socialnetwork.ui.controllers.table_obj.LabelMessage;
+import socialnetwork.ui.controllers.table_obj.TableConversation;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MessagesWindowController extends AbstractWindowController {
-    ObservableList<User> conversations = FXCollections.observableArrayList();
-    ObservableList<Message> currentMessages = FXCollections.observableArrayList();
-    List<Label> messages = new ArrayList<>();
+    ObservableList<TableConversation> conversations = FXCollections.observableArrayList();
+    TableConversation selectedConversation = null;
 
     @FXML
-    public TableView<User> conversationsTableView;
+    public TableView<TableConversation> conversationsTableView;
     @FXML
-    public TableColumn<User, String> firstNameColumn;
-    @FXML
-    public TableColumn<User, String> lastNameColumn;
+    public TableColumn<TableConversation, String> participantsColumn;
     @FXML
     public Button newConversationButton;
     @FXML
-    public TextField messageTextBox;
+    public TextField messageTextField;
     @FXML
-    public Button sendReplyButton;
+    public Button sendMessageButton;
     @FXML
     public VBox chatBox;
     @FXML
     public ScrollPane chatContainer;
 
     public void initialize() {
-        firstNameColumn.setCellValueFactory(new PropertyValueFactory<User, String>("firstName"));
-        lastNameColumn.setCellValueFactory(new PropertyValueFactory<User, String>("lastName"));
+        participantsColumn.setCellValueFactory(new PropertyValueFactory<TableConversation, String>("participants"));
         conversationsTableView.setItems(conversations);
+        conversationsTableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                selectedConversation = newSelection;
+                updateChat();
+            }
+        });
     }
 
     @Override
@@ -76,35 +81,50 @@ public class MessagesWindowController extends AbstractWindowController {
         }
     }
 
-    public void sendReply() {
+    public void sendMessage() {
+        try {
+            if (selectedConversation != null)
+                service.replyToMessage(loggedUser.getId(), selectedConversation.getConversationId(), messageTextField.getText());
+            updateChat();
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
+            alert.show();
+        }
+        messageTextField.clear();
     }
 
     @Override
     public void update() {
-        List<Message> conversationsList = service.getConversations(loggedUser.getId());
-        conversationsList.forEach(System.out::println);
-        List<User> users = new ArrayList<>();
-        for (Message message : conversationsList) {
-            List<Long> allMessageUsersIds = new ArrayList<>(message.getTo());
-            allMessageUsersIds.add(message.getFrom());
-            List<User> allMessageUsers = new ArrayList<>();
-            for (Long id : allMessageUsersIds) {
-                allMessageUsers.add(service.getUser(id));
-            }
-            for (User user : allMessageUsers) {
-                if (user != loggedUser)
-                    users.add(user);
+        List<TableConversation> conversationsList = new ArrayList<>();
+        for (Message conversation : service.getConversations(loggedUser.getId())) {
+            List<User> participants = (conversation.getFrom().equals(loggedUser.getId())) ?
+                    new ArrayList<>() :
+                    new ArrayList<>(Collections.singletonList(service.getUser(conversation.getFrom())));
+            for (Long toUserId : conversation.getTo())
+                if (!toUserId.equals(loggedUser.getId()))
+                    participants.add(service.getUser(toUserId));
+
+            conversationsList.add(new TableConversation(participants, conversation));
+        }
+        conversations.setAll(conversationsList);
+    }
+
+    private void updateChat() {
+        chatBox.getChildren().clear();
+        if (selectedConversation != null) {
+            List<Message> conversationMessages = new ArrayList<>(service.getConversation(loggedUser.getId(), selectedConversation.getConversationId()));
+            for (Message message : conversationMessages) {
+                LabelMessage messageLabel = new LabelMessage(message);
+                if (message.getFrom().equals(loggedUser.getId()))
+                    messageLabel.setAlignment(Pos.CENTER_LEFT);
+                else
+                    messageLabel.setAlignment(Pos.CENTER_RIGHT);
+//                messageLabel.setOnMouseClicked((event -> {
+//
+//                }));
+
+                chatBox.getChildren().add(messageLabel);
             }
         }
-        conversations.setAll(users);
-
-//        List<Message> messagesList = service.getConversation(loggedUser.getId(), )
-        messages.add(new Label("I'm a message"));
-
-        messages.get(0).setAlignment(Pos.CENTER_LEFT);
-        messages.get(0).setStyle("-fx-border-color:grey; -fx-background-color:white;");
-        messages.get(0).setPadding(new Insets(5,5,5,5));
-
-        chatBox.getChildren().add(messages.get(0));
     }
 }
