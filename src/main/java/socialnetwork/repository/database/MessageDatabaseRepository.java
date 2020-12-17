@@ -15,10 +15,6 @@ import java.util.List;
 public class MessageDatabaseRepository extends AbstractDatabaseRepository<Message> {
     protected Repository<User> userRepository;
 
-    public MessageDatabaseRepository(String url, String user, String password) {
-        super(url, user, password);
-    }
-
     public MessageDatabaseRepository(String url, String user, String password, Repository<User> userRepository) {
         super(url, user, password);
         this.userRepository = userRepository;

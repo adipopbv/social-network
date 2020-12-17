@@ -14,10 +14,6 @@ import java.time.LocalDateTime;
 public class InviteDatabaseRepository extends AbstractDatabaseRepository<Invite> {
     protected Repository<User> userRepository;
 
-    public InviteDatabaseRepository(String url, String user, String password) {
-        super(url, user, password);
-    }
-
     public InviteDatabaseRepository(String url, String user, String password, Repository<User> userRepository) {
         super(url, user, password);
         this.userRepository = userRepository;

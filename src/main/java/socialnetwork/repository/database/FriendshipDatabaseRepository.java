@@ -13,10 +13,6 @@ import java.time.LocalDateTime;
 public class FriendshipDatabaseRepository extends AbstractDatabaseRepository<Friendship>  {
     protected Repository<User> userRepository;
 
-    public FriendshipDatabaseRepository(String url, String user, String password) {
-        super(url, user, password);
-    }
-
     public FriendshipDatabaseRepository(String url, String user, String password, Repository<User> userRepository) {
         super(url, user, password);
         this.userRepository = userRepository;
