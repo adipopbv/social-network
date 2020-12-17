@@ -16,6 +16,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import socialnetwork.domain.Conversation;
 import socialnetwork.domain.Message;
 import socialnetwork.domain.User;
 import socialnetwork.service.SocialNetworkService;
@@ -46,7 +47,7 @@ public class MessagesWindowController extends AbstractWindowController {
     public ScrollPane chatContainer;
 
     public void initialize() {
-        participantsColumn.setCellValueFactory(new PropertyValueFactory<TableConversation, String>("participants"));
+        participantsColumn.setCellValueFactory(new PropertyValueFactory<TableConversation, String>("participantsNames"));
         conversationsTableView.setItems(conversations);
         conversationsTableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
@@ -84,7 +85,7 @@ public class MessagesWindowController extends AbstractWindowController {
     public void sendMessage() {
         try {
             if (selectedConversation != null)
-                service.replyToMessage(loggedUser.getId(), selectedConversation.getConversationId(), messageTextField.getText());
+                service.sendMessage(selectedConversation.getConversation().getId(), loggedUser.getId(), messageTextField.getText());
             updateChat();
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
@@ -96,26 +97,18 @@ public class MessagesWindowController extends AbstractWindowController {
     @Override
     public void update() {
         List<TableConversation> conversationsList = new ArrayList<>();
-        for (Message conversation : service.getConversations(loggedUser.getId())) {
-            List<User> participants = (conversation.getFrom().equals(loggedUser.getId())) ?
-                    new ArrayList<>() :
-                    new ArrayList<>(Collections.singletonList(service.getUser(conversation.getFrom())));
-            for (Long toUserId : conversation.getTo())
-                if (!toUserId.equals(loggedUser.getId()))
-                    participants.add(service.getUser(toUserId));
-
-            conversationsList.add(new TableConversation(participants, conversation));
-        }
+        for (Conversation conversation : service.getConversations(loggedUser.getId()))
+            conversationsList.add(new TableConversation(conversation));
         conversations.setAll(conversationsList);
     }
 
     private void updateChat() {
         chatBox.getChildren().clear();
         if (selectedConversation != null) {
-            List<Message> conversationMessages = new ArrayList<>(service.getConversation(loggedUser.getId(), selectedConversation.getConversationId()));
+            List<Message> conversationMessages = new ArrayList<>(service.getConversationMessages(selectedConversation.getConversation().getId()));
             for (Message message : conversationMessages) {
                 LabelMessage messageLabel = new LabelMessage(message);
-                if (message.getFrom().equals(loggedUser.getId()))
+                if (message.getFrom().equals(loggedUser))
                     messageLabel.setAlignment(Pos.CENTER_LEFT);
                 else
                     messageLabel.setAlignment(Pos.CENTER_RIGHT);
