@@ -1,6 +1,7 @@
 package socialnetwork.repository.database;
 
 import socialnetwork.domain.Entity;
+import socialnetwork.domain.Id;
 import socialnetwork.domain.exceptions.DatabaseException;
 import socialnetwork.domain.validators.Validator;
 import socialnetwork.repository.memory.MemoryRepository;
@@ -12,9 +13,9 @@ import java.util.List;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
-public abstract class AbstractDatabaseRepository<ID, E extends Entity<ID>> extends MemoryRepository<ID, E> {
-    Connection connection = null;
-    Statement statement = null;
+public abstract class AbstractDatabaseRepository<E extends Entity> extends MemoryRepository<E> {
+    protected Connection connection = null;
+    protected Statement statement = null;
 
     public AbstractDatabaseRepository(String url, String user, String password) {
         try {
@@ -24,7 +25,6 @@ public abstract class AbstractDatabaseRepository<ID, E extends Entity<ID>> exten
         } catch (Exception exception) {
             throw new DatabaseException("could not connect to database");
         }
-        loadData();
     }
 
     protected void loadData() { }
@@ -38,7 +38,7 @@ public abstract class AbstractDatabaseRepository<ID, E extends Entity<ID>> exten
     }
 
     @Override
-    public E delete(ID id) {
+    public E delete(Id id) {
         E e = super.delete(id);
         if (e != null)
             removeFromDatabase(id);
@@ -55,26 +55,26 @@ public abstract class AbstractDatabaseRepository<ID, E extends Entity<ID>> exten
 
     protected void addToDatabase (E entity) { }
 
-    protected void removeFromDatabase (ID id) { }
+    protected void removeFromDatabase (Id id) { }
 
     protected void updateInDatabase (E entity) { }
 
     protected void updateDatabase() { }
 
-    protected String listToDbString(List<Long> list) {
+    protected String idListToIdString(List<Id> idList) {
         StringBuilder dbString = new StringBuilder();
-        if (!list.isEmpty())
-            dbString.append(list.get(0).toString());
-        for (int index = 1; index < list.size(); index++)
-            dbString.append(",").append(list.get(index));
+        if (!idList.isEmpty())
+            dbString.append(idList.get(0).toString());
+        for (int index = 1; index < idList.size(); index++)
+            dbString.append(",").append(idList.get(index));
         return dbString.toString();
     }
 
-    protected List<Long> dbStringToList(String dbString) {
-        List<Long> list = new ArrayList<>();
-        String[] stringArray = dbString.split(",");
+    protected List<Id> idStringToIdList(String idString) {
+        List<Id> list = new ArrayList<>();
+        String[] stringArray = idString.split(",");
         if (stringArray.length > 0 && !stringArray[0].equals(""))
-            list = Arrays.stream(stringArray).map(Long::parseLong).collect(Collectors.toCollection(Vector::new));
+            list = Arrays.stream(stringArray).map(Id::new).collect(Collectors.toList());
         return list;
     }
 

@@ -34,12 +34,7 @@ public class TableInvite {
         this.invite = invite;
         firstName = user.getFirstName();
         lastName = user.getLastName();
-        switch (invite.getStatus()) {
-            case PENDING: status = "PENDING"; break;
-            case APPROVED: status = "APPROVED"; break;
-            case REJECTED: status = "REJECTED"; break;
-            default: status = null; break;
-        }
+        status =Invite.statusToString(invite.getStatus());
         date = invite.getDate().toString();
     }
 }

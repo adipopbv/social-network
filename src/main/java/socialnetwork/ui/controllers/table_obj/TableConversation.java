@@ -1,34 +1,33 @@
 package socialnetwork.ui.controllers.table_obj;
 
-import socialnetwork.domain.Entity;
-import socialnetwork.domain.Message;
-import socialnetwork.domain.User;
+import socialnetwork.domain.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class TableConversation {
-    private final List<Long> participantsIds;
-    private String participants;
-    private final Long conversationId;
+    private String participantsNames;
+    private final Conversation conversation;
 
-    public List<Long> getParticipantsIds() {
-        return participantsIds;
+    public String getParticipantsNames() {
+        return participantsNames;
     }
 
-    public String getParticipants() {
-        return participants;
+    public Conversation getConversation() {
+        return conversation;
     }
 
-    public Long getConversationId() {
-        return conversationId;
-    }
-
-    public TableConversation(List<User> participants, Message firstMessage) {
-        this.participantsIds = participants.stream().map(Entity::getId).collect(Collectors.toList());
-        this.participants = participants.get(0).getFirstName() + " " + participants.get(0).getLastName();
-        for (int index = 1; index < participants.size(); index++)
-            this.participants += ", " + participants.get(index).getFirstName() + " " + participants.get(index).getLastName();
-        this.conversationId = firstMessage.getId();
+    public TableConversation(Conversation conversation, User loggedUser) {
+        this.conversation = conversation;
+        if (loggedUser != conversation.getParticipants().get(0)) {
+            this.participantsNames = conversation.getParticipants().get(0).getFirstName() + " " + conversation.getParticipants().get(0).getLastName();
+            for (int index = 1; index < conversation.getParticipants().size(); index++)
+                if (loggedUser != conversation.getParticipants().get(index))
+                    this.participantsNames += ", " + conversation.getParticipants().get(index).getFirstName() + " " + conversation.getParticipants().get(index).getLastName();
+        } else {
+            this.participantsNames = conversation.getParticipants().get(1).getFirstName() + " " + conversation.getParticipants().get(1).getLastName();
+            for (int index = 2; index < conversation.getParticipants().size(); index++)
+                this.participantsNames += ", " + conversation.getParticipants().get(index).getFirstName() + " " + conversation.getParticipants().get(index).getLastName();
+        }
     }
 }

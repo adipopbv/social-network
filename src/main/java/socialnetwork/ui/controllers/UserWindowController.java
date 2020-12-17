@@ -121,6 +121,6 @@ public class UserWindowController extends AbstractWindowController {
 
     @Override
     public void update() {
-        userFriends.setAll(service.getFriends(loggedUser.getId()));
+        userFriends.setAll(loggedUser.getFriends());
     }
 }

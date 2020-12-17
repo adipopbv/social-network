@@ -5,10 +5,7 @@ import socialnetwork.domain.exceptions.DuplicateException;
 import socialnetwork.domain.exceptions.NotFoundException;
 import socialnetwork.domain.exceptions.ValidationException;
 import socialnetwork.domain.graphs.UndirectedGraph;
-import socialnetwork.domain.validators.FriendshipValidator;
-import socialnetwork.domain.validators.InviteValidator;
-import socialnetwork.domain.validators.MessageValidator;
-import socialnetwork.domain.validators.UserValidator;
+import socialnetwork.domain.validators.*;
 import socialnetwork.repository.Repository;
 import socialnetwork.utils.observers.Observable;
 import socialnetwork.utils.observers.Observer;
@@ -18,25 +15,29 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class SocialNetworkService implements Observable {
-    private final Repository<Long, User> userRepository;
+    private final Repository<User> userRepository;
     private final List<User> loggedInUsers = new ArrayList<>();
-    private final Repository<Long, Friendship> friendshipRepository;
-    private final Repository<Long, Message> messageRepository;
-    private final Repository<Long, Invite> inviteRepository;
+    private final Repository<Friendship> friendshipRepository;
+    private final Repository<Message> messageRepository;
+    private final Repository<Invite> inviteRepository;
+    private final Repository<Conversation> conversationRepository;
     private final UserValidator userValidator;
     private final FriendshipValidator friendshipValidator;
     private final MessageValidator messageValidator;
     private final InviteValidator inviteValidator;
+    private final ConversationValidator conversationValidator;
 
-    public SocialNetworkService(Repository<Long, User> userRepository, Repository<Long, Friendship> friendshipRepository, Repository<Long, Message> messageRepository, Repository<Long, Invite> inviteRepository) {
+    public SocialNetworkService(Repository<User> userRepository, Repository<Friendship> friendshipRepository, Repository<Message> messageRepository, Repository<Invite> inviteRepository, Repository<Conversation> conversationRepository) {
         this.userRepository = userRepository;
         this.friendshipRepository = friendshipRepository;
         this.messageRepository = messageRepository;
         this.inviteRepository = inviteRepository;
+        this.conversationRepository = conversationRepository;
         userValidator = new UserValidator();
         friendshipValidator = new FriendshipValidator();
         messageValidator = new MessageValidator();
         inviteValidator = new InviteValidator();
+        conversationValidator = new ConversationValidator();
     }
 
     /**
@@ -44,7 +45,7 @@ public class SocialNetworkService implements Observable {
      * @param userId the id of the user to be logged in
      * @return the user that logged in
      */
-    public User logInUser(long userId) {
+    public User logInUser(Id userId) {
         User user = userRepository.findOne(userId);
         if (loggedInUsers.contains(user))
             throw new DuplicateException("user already logged in");
@@ -58,7 +59,7 @@ public class SocialNetworkService implements Observable {
      * @param userId the id of the user to be logged out
      * @return the user that logged out
      */
-    public User logOutUser(long userId) {
+    public User logOutUser(Id userId) {
         User user = userRepository.findOne(userId);
         if (!loggedInUsers.contains(user))
             throw new NotFoundException("user not logged in");
@@ -79,7 +80,7 @@ public class SocialNetworkService implements Observable {
      * Gets a user from the repo
      * @return the user
      */
-    public User getUser(Long userId) {
+    public User getUser(Id userId) {
         return userRepository.findOne(userId);
     }
 
@@ -116,9 +117,8 @@ public class SocialNetworkService implements Observable {
     public User addUser(String firstName, String lastName) {
         User user = new User(firstName, lastName);
         userValidator.validate(user);
-        Random random = new Random();
         do {
-            user.setId((long) (random.nextInt(9000) + 1000));
+            user.setId(new Id());
         } while (userRepository.save(user) != null);
 
         notifyObservers();
@@ -130,17 +130,17 @@ public class SocialNetworkService implements Observable {
      * @param id the id of the user to be removed
      * @return the removed user if operation successful
      */
-    public User removeUser(long id) {
+    public User removeUser(Id id) {
         User user = userRepository.delete(id);
 
         Collection<Friendship> toBeErased = new ArrayList<>();
         for (Friendship friendship : friendshipRepository.findAll())
-            if (user.getId() == friendship.getFriend1() || user.getId() == friendship.getFriend2())
+            if (user.getId() == friendship.getFirstFriendId() || user.getId() == friendship.getSecondFriendId())
                 toBeErased.add(friendship);
         for (Friendship friendship : toBeErased)
             friendshipRepository.delete(friendship.getId());
         for (User userSearch : userRepository.findAll())
-            userSearch.getFriends().remove(id);
+            userSearch.getFriends().remove(user);
 
         notifyObservers();
         return user;
@@ -148,23 +148,26 @@ public class SocialNetworkService implements Observable {
 
     /**
      * Adds a new friendship to the repo
-     * @param id1 the id of the first user from the friendship
-     * @param id2 the id of the second user from the friendship
+     * @param firstFriendId the id of the first user from the friendship
+     * @param secondFriendId the id of the second user from the friendship
      * @return the newly created friendship if the operation was successful
      */
-    public Friendship addFriendship(long id1, long id2) {
-        Friendship friendship = new Friendship(id1, id2);
+    public Friendship addFriendship(Id firstFriendId, Id secondFriendId) {
+        User firstFriend = userRepository.findOne(firstFriendId);
+        User secondFriend = userRepository.findOne(secondFriendId);
+        if (firstFriend == null || secondFriend == null)
+            throw new NotFoundException("nonexistent users");
+
+        Friendship friendship = new Friendship(firstFriend, secondFriend);
         friendshipValidator.validate(friendship);
-        Random random = new Random();
         do {
-            friendship.setId((long) (random.nextInt(9000) + 1000));
+            friendship.setId(new Id());
         } while (friendshipRepository.save(friendship) != null);
 
-        User user1 = userRepository.findOne(id1), user2 = userRepository.findOne(id2);
-        user1.getFriends().add(user2.getId());
-        user2.getFriends().add(user1.getId());
-        userRepository.update(user1);
-        userRepository.update(user2);
+        firstFriend.getFriends().add(secondFriend);
+        secondFriend.getFriends().add(firstFriend);
+        userRepository.update(firstFriend);
+        userRepository.update(secondFriend);
 
         notifyObservers();
         return friendship;
@@ -176,19 +179,21 @@ public class SocialNetworkService implements Observable {
      * @param friendshipId the id of the friendship to be removed
      * @return the friendship that has been removed if the operation was successful
      */
-    public Friendship removeFriendship(long userId, long friendshipId) {
-        if (userRepository.findOne(userId) == null)
+    public Friendship removeFriendship(Id userId, Id friendshipId) {
+        User user = userRepository.findOne(userId);
+        Friendship friendship = friendshipRepository.findOne(friendshipId);
+        if (user == null)
             throw new ValidationException("invalid user");
-        if (friendshipRepository.findOne(friendshipId) == null ||
-                (friendshipRepository.findOne(friendshipId).getFriend1() != userId &&
-                friendshipRepository.findOne(friendshipId).getFriend2() != userId))
+        if (friendship == null ||
+                (friendship.getFirstFriend() != user &&
+                friendship.getSecondFriend() != user))
             throw new ValidationException("invalid friendship");
 
-        Friendship friendship = friendshipRepository.delete(friendshipId);
+        friendshipRepository.delete(friendship.getId());
 
-        User user1 = userRepository.findOne(friendship.getFriend1()), user2 = userRepository.findOne(friendship.getFriend2());
-        user1.getFriends().remove(user2.getId());
-        user2.getFriends().remove(user1.getId());
+        User user1 = userRepository.findOne(friendship.getFirstFriendId()), user2 = userRepository.findOne(friendship.getSecondFriendId());
+        user1.getFriends().remove(user2);
+        user2.getFriends().remove(user1);
         userRepository.update(user1);
         userRepository.update(user2);
 
@@ -201,10 +206,10 @@ public class SocialNetworkService implements Observable {
      * @return the number of communities
      */
     public int getCommunitiesCount() {
-        Map<Long, HashSet<Long>> adjMap = new HashMap<>();
+        Map<Id, HashSet<Id>> adjMap = new HashMap<>();
         for (User user : getAllUsers()) {
-            for (long friendId : user.getFriends()) {
-                long userId = user.getId();
+            for (Id friendId : user.getFriendsIds()) {
+                Id userId = user.getId();
                 adjMap.putIfAbsent(userId, new HashSet<>());
                 adjMap.putIfAbsent(friendId, new HashSet<>());
                 adjMap.get(userId).add(friendId);
@@ -222,10 +227,10 @@ public class SocialNetworkService implements Observable {
      * @return the users of the most sociable community
      */
     public Iterable<User> getMostSociableCommunity() {
-        Map<Long, HashSet<Long>> adjMap = new HashMap<>();
+        Map<Id, HashSet<Id>> adjMap = new HashMap<>();
         for (User user : getAllUsers()) {
-            for (long friendId : user.getFriends()) {
-                long userId = user.getId();
+            for (Id friendId : user.getFriendsIds()) {
+                Id userId = user.getId();
                 adjMap.putIfAbsent(userId, new HashSet<>());
                 adjMap.putIfAbsent(friendId, new HashSet<>());
                 adjMap.get(userId).add(friendId);
@@ -236,8 +241,8 @@ public class SocialNetworkService implements Observable {
         }
         UndirectedGraph graph = new UndirectedGraph(adjMap);
         Collection<User> mostSociableNetwork = new ArrayList<>();
-        Iterable<Long> connectedComponent = graph.getConnectedComponentWithLongestRoad();
-        for (long vertex : connectedComponent) {
+        Iterable<Id> connectedComponent = graph.getConnectedComponentWithLongestRoad();
+        for (Id vertex : connectedComponent) {
             mostSociableNetwork.add(userRepository.findOne(vertex));
         }
         return mostSociableNetwork;
@@ -248,15 +253,15 @@ public class SocialNetworkService implements Observable {
      * @param id the id of the user whose friends will be returned
      * @return the friends and friendship dates of the user
      */
-    public Map<User, LocalDateTime> getUserFriendships(long id) {
+    public Map<User, LocalDateTime> getUserFriendships(Id id) {
         Map<User, LocalDateTime> friends = new HashMap<>();
         Collection<Friendship> friendships = new ArrayList<>(friendshipRepository.findAll());
 
         friendships = friendships.stream()
-                .filter(fr -> fr.getFriend1() == id || fr.getFriend2() == id)
+                .filter(fr -> fr.getFirstFriendId() == id || fr.getSecondFriendId() == id)
                 .collect(Collectors.toCollection(ArrayList::new));
         friendships.forEach(friendship -> {
-            long friendId = (id == friendship.getFriend1()) ? friendship.getFriend2() : friendship.getFriend1();
+            Id friendId = (id == friendship.getFirstFriendId()) ? friendship.getSecondFriendId() : friendship.getFirstFriendId();
             friends.put(userRepository.findOne(friendId), friendship.getDate());
         });
 
@@ -268,15 +273,15 @@ public class SocialNetworkService implements Observable {
      * @param id the id of the user whose friends will be returned
      * @return the friends and friendship dates of the user
      */
-    public Map<User, LocalDateTime> getUserFriendshipsInMonth(long id, int month) {
+    public Map<User, LocalDateTime> getUserFriendshipsInMonth(Id id, int month) {
         Map<User, LocalDateTime> friends = new HashMap<>();
         Collection<Friendship> friendships = new ArrayList<>(friendshipRepository.findAll());
 
         friendships = friendships.stream()
-                .filter(fr -> (fr.getFriend1() == id || fr.getFriend2() == id) && fr.getDate().getMonth().getValue() == month)
+                .filter(fr -> (fr.getFirstFriendId() == id || fr.getSecondFriendId() == id) && fr.getDate().getMonth().getValue() == month)
                 .collect(Collectors.toCollection(ArrayList::new));
         friendships.forEach(friendship -> {
-            long friendId = (id == friendship.getFriend1()) ? friendship.getFriend2() : friendship.getFriend1();
+            Id friendId = (id == friendship.getFirstFriendId()) ? friendship.getSecondFriendId() : friendship.getFirstFriendId();
             friends.put(userRepository.findOne(friendId), friendship.getDate());
         });
 
@@ -284,124 +289,142 @@ public class SocialNetworkService implements Observable {
     }
 
     /**
-     * Adds a message to the repo
-     * @param id the id of the user that sends the message
-     * @param to the ids of teh users that receive the message
-     * @param messageValue the message body
-     * @return the newly created message if the operation was successful
-     */
-    public Message sendMessage(long id, List<Long> to, String messageValue) {
-        Message message = new Message(id, to, messageValue);
-        message.setReply(false);
-
-        messageValidator.validate(message);
-        boolean okTo = true;
-        for (Long toId : to)
-            if (userRepository.findOne(toId) == null) {
-                okTo = false;
-                break;
-            }
-        if (userRepository.findOne(id) == null ||
-                !okTo)
-            throw new ValidationException("invalid users");
-
-        Random random = new Random();
-        do {
-            message.setId((long) (random.nextInt(9000) + 1000));
-        } while (messageRepository.save(message) != null);
-
-        notifyObservers();
-        return message;
-    }
-
-    /**
      * Gets all conversations that implicate a user
      * @param userId the id of the user that takes part in the conversations
-     * @return a list composed of the first message of each conversation
+     * @return a list composed of the conversations
      */
-    public List<Message> getConversations(long userId) {
-        if (userRepository.findOne(userId) == null)
+    public List<Conversation> getConversations(Id userId) {
+        User user = userRepository.findOne(userId);
+        if (user == null)
             throw new NotFoundException("nonexistent user");
 
-        List<Message> conversations = new ArrayList<>(messageRepository.findAll());
+        List<Conversation> conversations = new ArrayList<>(conversationRepository.findAll());
         conversations = conversations.stream()
-                .filter(conversation ->
-                        (conversation.getFrom().equals(userId) ||
-                                conversation.getTo().contains(userId)) &&
-                                !conversation.isReply())
-                .collect(Collectors.toCollection(ArrayList::new));
+                .filter(conversation -> conversation.getParticipants().contains(user))
+                .collect(Collectors.toList());
 
         return conversations;
     }
 
     /**
      * Gets the messages of a conversation
-     * @param userId the id of the user that is taking part of the conversation
-     * @param conversationId the id of the first message of the conversation
+     * @param conversationId the id of the conversation
      * @return the list of messages of the conversation
      */
-    public List<Message> getConversation(long userId, long conversationId) {
-        if (userRepository.findOne(userId) == null)
-            throw new ValidationException("invalid user");
-        if (messageRepository.findOne(conversationId) == null ||
-                (messageRepository.findOne(conversationId).getFrom() != userId &&
-                        !messageRepository.findOne(conversationId).getTo().contains(userId)))
-            throw new ValidationException("invalid message");
+    public List<Message> getConversationMessages(Id conversationId) {
+        Conversation conversation = conversationRepository.findOne(conversationId);
+        if (conversation == null)
+            throw new ValidationException("invalid conversation");
 
-        List<Message> conversation = new ArrayList<>();
-        Message message = messageRepository.findOne(conversationId);
-        conversation.add(message);
-        while (message.getResponse() != 0) {
-            message = messageRepository.findOne(message.getResponse());
-            conversation.add(message);
-        }
-
-        return conversation;
+        return conversation.getMessages();
     }
 
     /**
-     * Adds a message ro the repo as a reply to a message or another reply
-     * @param userId the id of the user taking part to the conversation
-     * @param replyToId the id of the message that is replying to
-     * @param messageValue the message body
-     * @return the newly created reply if the operation was successful
+     * Creates a new conversation
+     * @param fromId the id of the user sending the first message of the conversation
+     * @param toIds the ids of the users receiving the message
+     * @param text the message body
+     * @return the newly created conversation if operation successful
      */
-    public Message replyToMessage(long userId, long replyToId, String messageValue) {
-        if (userRepository.findOne(userId) == null)
-            throw new ValidationException("invalid user");
-        if (messageRepository.findOne(replyToId) == null ||
-                messageRepository.findOne(replyToId).getFrom() == userId ||
-                !messageRepository.findOne(replyToId).getTo().contains(userId))
-            throw new ValidationException("invalid message");
+    public Conversation addConversation(Id fromId, List<Id> toIds, String text) {
+        User from = userRepository.findOne(fromId);
+        List<User> to = new ArrayList<>();
+        for (Id toId : toIds)
+            to.add(userRepository.findOne(toId));
+        if (from == null || to.isEmpty())
+            throw new NotFoundException("user not found");
 
-        Message original = messageRepository.findOne(replyToId);
-        Message message = new Message(userId, new ArrayList<>(Arrays.asList(original.getFrom())), messageValue);
+        Message message = new Message(from, to, text);
+        messageValidator.validate(message);
+        do {
+            message.setId(new Id());
+        } while (messageRepository.save(message) != null);
+
+        to.add(from);
+        Conversation conversation = new Conversation(to, new ArrayList<>(Collections.singletonList(message)));
+        conversationValidator.validate(conversation);
+        do {
+            conversation.setId(new Id());
+        } while (conversationRepository.save(conversation) != null);
+
+        notifyObservers();
+        return null;
+    }
+
+    /**
+     * Adds a message to the repo
+     * @param conversationId the id of the conversation
+     * @param fromId the id of the user that sends the message
+     * @param text the message body
+     * @return the newly created message if the operation was successful
+     */
+    public Message sendMessage(Id conversationId, Id fromId, String text) {
+        Conversation conversation = conversationRepository.findOne(conversationId);
+        User from = userRepository.findOne(fromId);
+        if (from == null || !conversation.getParticipants().contains(from))
+            throw new ValidationException("invalid user and conversation");
+
+        List<User> to = new ArrayList<>(conversation.getParticipants());
+        to.remove(from);
+        Message message = new Message(from, to, text);
 
         messageValidator.validate(message);
-
-        Random random = new Random();
         do {
-            message.setId((long) (random.nextInt(9000) + 1000));
+            message.setId(new Id());
         } while (messageRepository.save(message) != null);
-        original.setResponse(message.getId());
-        messageRepository.update(original);
+        conversation.getMessages().add(message);
+        conversationRepository.update(conversation);
 
         notifyObservers();
         return message;
     }
 
     /**
+     * Adds a message ro the repo as a reply to a message or another reply
+     * @param conversationId the id of the conversation
+     * @param fromId the id of the user taking part to the conversation
+     * @param originalId the id of the message that is replying to
+     * @param text the message body
+     * @return the newly created reply if the operation was successful
+     */
+    public Message sendReply(Id conversationId, Id fromId, Id originalId, String text) {
+        Conversation conversation = conversationRepository.findOne(conversationId);
+        User from = userRepository.findOne(fromId);
+        Message original = messageRepository.findOne(originalId);
+        if (from == null || !conversation.getParticipants().contains(from))
+            throw new ValidationException("invalid user and conversation");
+
+        List<User> to = new ArrayList<>(Collections.singletonList(original.getFrom()));
+        Message response = new Message(from, to, text);
+
+        messageValidator.validate(response);
+        response.setOriginal(original);
+        original.setResponse(response);
+        do {
+            response.setId(new Id());
+        } while (messageRepository.save(response) != null);
+        messageRepository.update(original);
+        conversation.getMessages().add(response);
+        conversationRepository.update(conversation);
+
+        notifyObservers();
+        return response;
+    }
+
+    /**
      * Adds a new friendship invite to the repo
-     * @param from the id of the user inviting
-     * @param to the id of the user being invited
+     * @param fromId the id of the user inviting
+     * @param toId the id of the user being invited
      * @return the newly created invite if the operation was successful
      */
-    public Invite sendInvite(long from, long to) {
-        if (userRepository.findOne(from) == null ||
-                userRepository.findOne(to) == null ||
+    public Invite sendInvite(Id fromId, Id toId) {
+        User from = userRepository.findOne(fromId);
+        User to = userRepository.findOne(toId);
+        if (from == null ||
+                to == null ||
                 from == to)
-            throw new ValidationException("invalid users ids");
-        if (userRepository.findOne(to).getFriends().contains(from))
+            throw new ValidationException("invalid users");
+        if (to.getFriends().contains(from))
             throw new DuplicateException("users already friends");
         for (Invite invite : inviteRepository.findAll())
             if (((invite.getFrom() == from && invite.getTo() == to) ||
@@ -411,9 +434,8 @@ public class SocialNetworkService implements Observable {
 
         Invite invite = new Invite(from, to);
         inviteValidator.validate(invite);
-        Random random = new Random();
         do {
-            invite.setId((long) (random.nextInt(9000) + 1000));
+            invite.setId(new Id());
         } while (inviteRepository.save(invite) != null);
 
         notifyObservers();
@@ -425,10 +447,11 @@ public class SocialNetworkService implements Observable {
      * @param userId the id of the user taking part in the invite
      * @return the list of invites
      */
-    public List<Invite> getInvites(long userId) {
+    public List<Invite> getInvites(Id userId) {
+        User user = userRepository.findOne(userId);
         List<Invite> invites = new ArrayList<>();
         for (Invite invite : inviteRepository.findAll())
-            if (invite.getFrom() == userId || invite.getTo() == userId)
+            if (invite.getFrom() == user || invite.getTo() == user)
                 invites.add(invite);
         return invites;
     }
@@ -439,13 +462,14 @@ public class SocialNetworkService implements Observable {
      * @param inviteId the id of the invite being accepted
      * @return the newly created friendship after accepting the invite if the operation was successful
      */
-    public Friendship acceptInvite(long userId, long inviteId) {
-        if (userRepository.findOne(userId) == null)
-            throw new NotFoundException("nonexistent user");
+    public Friendship acceptInvite(Id userId, Id inviteId) {
+        User user = userRepository.findOne(userId);
         Invite invite = inviteRepository.findOne(inviteId);
-        if (invite == null ||
-                invite.getFrom() == userId ||
-                invite.getTo() != userId ||
+        if (userRepository.findOne(user.getId()) == null)
+            throw new NotFoundException("nonexistent user");
+        if (inviteRepository.findOne(invite.getId()) == null ||
+                invite.getFrom() == user ||
+                invite.getTo() != user ||
                 invite.getStatus() != InviteStatus.PENDING)
             throw new ValidationException("invalid invite");
 
@@ -453,7 +477,7 @@ public class SocialNetworkService implements Observable {
         inviteRepository.update(invite);
 
         notifyObservers();
-        return addFriendship(invite.getFrom(), invite.getTo());
+        return addFriendship(invite.getFrom().getId(), invite.getTo().getId());
     }
 
     /**
@@ -462,13 +486,14 @@ public class SocialNetworkService implements Observable {
      * @param inviteId the id of the invite being rejected
      * @return the invite after being rejected if the operation was successful
      */
-    public Invite rejectInvite(long userId, long inviteId) {
-        if (userRepository.findOne(userId) == null)
-            throw new NotFoundException("nonexistent user");
+    public Invite rejectInvite(Id userId, Id inviteId) {
+        User user = userRepository.findOne(userId);
         Invite invite = inviteRepository.findOne(inviteId);
-        if (invite == null ||
-                (invite.getFrom() != userId &&
-                        invite.getTo() != userId) ||
+        if (userRepository.findOne(user.getId()) == null)
+            throw new NotFoundException("nonexistent user");
+        if (inviteRepository.findOne(invite.getId()) == null ||
+                (invite.getFrom() != user &&
+                        invite.getTo() != user) ||
                 invite.getStatus() != InviteStatus.PENDING)
             throw new ValidationException("invalid invite");
 
@@ -479,27 +504,22 @@ public class SocialNetworkService implements Observable {
         return invite;
     }
 
-    public List<User> getFriends(long userId) {
-        if (userRepository.findOne(userId) == null)
-            throw new NotFoundException("nonexistent user");
-
+    /**
+     * Removes a friend
+     * @param userId the id of the user removing the friend
+     * @param friendId the id of the friend being removed
+     */
+    public void removeFriend(Id userId, Id friendId) {
         User user = userRepository.findOne(userId);
-        List<User> friends = new ArrayList<>();
-        for (Long friendId : user.getFriends()) {
-            friends.add(userRepository.findOne(friendId));
-        }
-        return friends;
-    }
-
-    public void removeFriend(long userId, long friendId) {
-        if (userRepository.findOne(userId) == null ||
-                userRepository.findOne(friendId) == null)
+        User friend = userRepository.findOne(friendId);
+        if (user == null ||
+                friend == null)
             throw new NotFoundException("nonexistent user");
 
         for (Friendship friendship : friendshipRepository.findAll()) {
-            if ((friendship.getFriend1() == userId && friendship.getFriend2() == friendId) ||
-                    (friendship.getFriend1() == friendId && friendship.getFriend2() == userId)) {
-                removeFriendship(userId, friendship.getId());
+            if ((friendship.getFirstFriend() == user && friendship.getSecondFriend() == friend) ||
+                    (friendship.getFirstFriend() == friend && friendship.getSecondFriend() == user)) {
+                removeFriendship(user.getId(), friendship.getId());
                 break;
             }
         }
@@ -515,6 +535,7 @@ public class SocialNetworkService implements Observable {
         friendshipRepository.close();
         messageRepository.close();
         inviteRepository.close();
+        conversationRepository.close();
     }
 
     @Override
