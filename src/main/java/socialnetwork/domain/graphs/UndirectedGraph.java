@@ -1,15 +1,17 @@
 package socialnetwork.domain.graphs;
 
+import socialnetwork.domain.Id;
+
 import java.util.*;
 
 public class UndirectedGraph {
-    protected Map<Long, HashSet<Long>> adjMap;
-    protected Map<Long, Boolean> visited = new HashMap<>();
+    protected Map<Id, HashSet<Id>> adjMap;
+    protected Map<Id, Boolean> visited = new HashMap<>();
 
-    public UndirectedGraph(Map<Long, HashSet<Long>> adjMap) {
+    public UndirectedGraph(Map<Id, HashSet<Id>> adjMap) {
         this.adjMap = adjMap;
-        for (long userId : adjMap.keySet()) {
-            for (long friendId : adjMap.get(userId)) {
+        for (Id userId : adjMap.keySet()) {
+            for (Id friendId : adjMap.get(userId)) {
                 visited.put(userId, false);
                 visited.put(friendId, false);
             }
@@ -20,13 +22,13 @@ public class UndirectedGraph {
         visited.replaceAll((k, v) -> false);
     }
 
-    private int visitNextVertex(Long vertex) {
+    private int visitNextVertex(Id vertex) {
         int maxPathLength = 0;
         visited.put(vertex, true);
-        for (long adjVertex : adjMap.get(vertex)) {
+        for (Id adjVertex : adjMap.get(vertex)) {
             if (!visited.get(adjVertex)) {
-                int pathLenght = visitNextVertex(adjVertex);
-                maxPathLength = Math.max(maxPathLength, pathLenght);
+                int pathLength = visitNextVertex(adjVertex);
+                maxPathLength = Math.max(maxPathLength, pathLength);
             }
         }
         return maxPathLength + 1;
@@ -35,7 +37,7 @@ public class UndirectedGraph {
     public int getConnectedComponentsCount() {
         int count = 0;
         resetVisited();
-        for (long vertex : visited.keySet()) {
+        for (Id vertex : visited.keySet()) {
             if (!visited.get(vertex)) {
                 visitNextVertex(vertex);
                 count++;
@@ -44,30 +46,30 @@ public class UndirectedGraph {
         return count;
     }
 
-    private void makeSubgraph(long vertex, Collection<Long> connectedComponent) {
+    private void makeSubgraph(Id vertex, Collection<Id> connectedComponent) {
         connectedComponent.add(vertex);
         visited.put(vertex, true);
-        for (long adjVertex : adjMap.get(vertex)) {
+        for (Id adjVertex : adjMap.get(vertex)) {
             if (!visited.get(adjVertex)) {
                 makeSubgraph(adjVertex, connectedComponent);
             }
         }
     }
 
-    public Iterable<Long> getConnectedComponentWithLongestRoad() {
+    public Iterable<Id> getConnectedComponentWithLongestRoad() {
         resetVisited();
         int maxPathLength = 0;
-        long startVertex = -1;
-        for (long vertex : visited.keySet()) {
+        Id startVertex = new Id(-1);
+        for (Id vertex : visited.keySet()) {
             if (!visited.get(vertex)) {
-                int pathLenght = visitNextVertex(vertex);
-                if (maxPathLength < pathLenght) {
-                    maxPathLength = pathLenght;
+                int pathLength = visitNextVertex(vertex);
+                if (maxPathLength < pathLength) {
+                    maxPathLength = pathLength;
                     startVertex = vertex;
                 }
             }
         }
-        Collection<Long> connectedComponent = new ArrayList<>();
+        Collection<Id> connectedComponent = new ArrayList<>();
         resetVisited();
         makeSubgraph(startVertex, connectedComponent);
         return connectedComponent;

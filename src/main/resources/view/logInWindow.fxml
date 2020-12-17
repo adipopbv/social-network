@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="355.0" prefWidth="270.0" style="-fx-background-color: grey;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="socialnetwork.ui.controllers.LogInWindowController">
+    <children>
+        <Text fill="WHITE" layoutX="22.0" layoutY="50.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Social Network!" textAlignment="CENTER" wrappingWidth="230.0" AnchorPane.leftAnchor="22.0" AnchorPane.rightAnchor="19.0" AnchorPane.topAnchor="23.274999618530273">
+            <font>
+                <Font name="Noto Sans Regular" size="25.0" />
+            </font>
+        </Text>
+        <Separator layoutX="35.0" layoutY="72.0" prefWidth="200.0" AnchorPane.leftAnchor="35.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="80.0" />
+        <Button fx:id="logInAcceptButton" layoutX="94.0" layoutY="193.0" mnemonicParsing="false" onAction="#logIn" prefHeight="26.0" prefWidth="81.0" text="Accept" AnchorPane.leftAnchor="94.0" AnchorPane.rightAnchor="95.0" AnchorPane.topAnchor="193.0" />
+        <TextField fx:id="logInUserIdField" alignment="CENTER" layoutX="51.0" layoutY="152.0" promptText="user id..." AnchorPane.leftAnchor="51.0" AnchorPane.rightAnchor="48.0" AnchorPane.topAnchor="152.0" />
+        <Text fill="WHITE" layoutX="11.0" layoutY="128.0" strokeType="OUTSIDE" strokeWidth="0.0" text="log in" textAlignment="CENTER" wrappingWidth="251.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="108.75799942016602">
+            <font>
+                <Font name="Noto Sans Regular" size="18.0" />
+            </font>
+        </Text>
+        <Text fill="WHITE" layoutX="43.0" layoutY="280.0" strokeType="OUTSIDE" strokeWidth="0.0" text="don't have an account yet?" textAlignment="CENTER" wrappingWidth="185.0" AnchorPane.leftAnchor="43.0" AnchorPane.rightAnchor="43.0" AnchorPane.topAnchor="265.0340003967285">
+            <font>
+                <Font name="Noto Sans Regular" size="14.0" />
+            </font>
+        </Text>
+        <Button fx:id="logInToSignUpButton" layoutX="96.0" layoutY="303.0" mnemonicParsing="false" onAction="#toSignUp" prefHeight="26.0" prefWidth="81.0" text="Sign up" AnchorPane.leftAnchor="96.0" AnchorPane.rightAnchor="94.0" AnchorPane.topAnchor="303.0" />
+    </children>
+</AnchorPane>
