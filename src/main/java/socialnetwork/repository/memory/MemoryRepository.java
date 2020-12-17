@@ -1,27 +1,24 @@
 package socialnetwork.repository.memory;
 
 import socialnetwork.domain.Entity;
+import socialnetwork.domain.Id;
 import socialnetwork.domain.exceptions.NotFoundException;
 import socialnetwork.repository.Repository;
 
 import java.util.*;
 
-public class MemoryRepository<ID, E extends Entity<ID>> implements Repository<ID,E> {
-    protected Map<ID,E> entities;
+public class MemoryRepository<E extends Entity> implements Repository<E> {
+    protected Map<Id, E> entities;
 
     public MemoryRepository() {
         entities = new HashMap<>();
     }
 
     @Override
-    public E findOne(ID id){
+    public E findOne(Id id){
         if (id == null)
             throw new IllegalArgumentException("id must not be null");
-//        try {
-            return entities.get(id);
-//        } catch (Exception e) {
-//            throw new NotFoundException("entity not found");
-//        }
+        return entities.get(id);
     }
 
     @Override
@@ -38,15 +35,17 @@ public class MemoryRepository<ID, E extends Entity<ID>> implements Repository<ID
             return entity;
         else
             entities.put(entity.getId(),entity);
+
         return null;
     }
 
     @Override
-    public E delete(ID id) {
+    public E delete(Id id) {
         if (id == null)
             throw new IllegalArgumentException("id must not be null");
         if (entities.get(id) == null)
             throw new NotFoundException("entity not found in repo");
+
         return entities.remove(id);
     }
 
@@ -54,13 +53,11 @@ public class MemoryRepository<ID, E extends Entity<ID>> implements Repository<ID
     public E update(E entity) {
         if(entity == null)
             throw new IllegalArgumentException("entity must be not null!");
-
         entities.put(entity.getId(),entity);
+
         return entity;
     }
 
     @Override
-    public void close() {
-
-    }
+    public void close() { }
 }

@@ -1,17 +1,17 @@
 package socialnetwork.repository;
 
 import socialnetwork.domain.Entity;
+import socialnetwork.domain.Id;
 import socialnetwork.domain.exceptions.ValidationException;
 
 import java.util.List;
 
 /**
  * CRUD operations repository interface
- * @param <ID> - type E must have an attribute of type ID
  * @param <E> -  type of entities saved in repository
  */
 
-public interface Repository<ID, E extends Entity<ID>> {
+public interface Repository<E extends Entity> {
 
     /**
      *
@@ -22,7 +22,7 @@ public interface Repository<ID, E extends Entity<ID>> {
      * @throws IllegalArgumentException
      *                  if id is null.
      */
-    E findOne(ID id);
+    E findOne(Id id);
 
     /**
      *
@@ -52,7 +52,7 @@ public interface Repository<ID, E extends Entity<ID>> {
      * @throws IllegalArgumentException
      *                   if the given id is null.
      */
-    E delete(ID id);
+    E delete(Id id);
 
     /**
      *

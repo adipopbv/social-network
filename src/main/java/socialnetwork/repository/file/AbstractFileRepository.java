@@ -1,6 +1,7 @@
 package socialnetwork.repository.file;
 
 import socialnetwork.domain.Entity;
+import socialnetwork.domain.Id;
 import socialnetwork.domain.validators.Validator;
 import socialnetwork.repository.memory.MemoryRepository;
 
@@ -9,7 +10,7 @@ import java.nio.file.*;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class AbstractFileRepository<ID, E extends Entity<ID>> extends MemoryRepository<ID,E> {
+public abstract class AbstractFileRepository<E extends Entity> extends MemoryRepository<E> {
     protected String fileName;
 
     public AbstractFileRepository(String fileName) {
@@ -17,12 +18,12 @@ public abstract class AbstractFileRepository<ID, E extends Entity<ID>> extends M
         loadData();
     }
 
-    private void loadData() {
+    protected void loadData() {
         Path path = Paths.get(fileName);
         try {
             List<String> lines = Files.readAllLines(path);
-            lines.forEach(linie -> {
-                E entity=extractEntity(Arrays.asList(linie.split(";")));
+            lines.forEach(line -> {
+                E entity=extractEntity(Arrays.asList(line.split(";")));
                 super.save(entity);
             });
         } catch (IOException e) {
@@ -30,7 +31,6 @@ public abstract class AbstractFileRepository<ID, E extends Entity<ID>> extends M
         }
     }
 
-    /// TODO: factory pattern for entity creation
     public abstract E extractEntity(List<String> attributes);
 
     protected abstract String createEntityAsString(E entity);
@@ -44,7 +44,7 @@ public abstract class AbstractFileRepository<ID, E extends Entity<ID>> extends M
     }
 
     @Override
-    public E delete(ID id) {
+    public E delete(Id id) {
         E e = super.delete(id);
         if (e != null)
             rewriteToFile();

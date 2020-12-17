@@ -23,10 +23,10 @@ public class JavaFxClient extends Application implements SocialNetworkClient{
     public JavaFxClient() {
         String dbUrl = "jdbc:postgresql://localhost:5432/socialnetwork";
         String user = "adipopbv", password = "adipopbv";
-        Repository<Long, User> userRepository = new UserDatabaseRepository(dbUrl, user, password);
-        Repository<Long, Friendship> friendshipRepository = new FriendshipDatabaseRepository(dbUrl, user, password);
-        Repository<Long, Message> messageRepository = new MessageDatabaseRepository(dbUrl, user, password);
-        Repository<Long, Invite> inviteRepository = new InviteDatabaseRepository(dbUrl, user, password);
+        Repository<User> userRepository = new UserDatabaseRepository(dbUrl, user, password);
+        Repository<Friendship> friendshipRepository = new FriendshipDatabaseRepository(dbUrl, user, password);
+        Repository<Message> messageRepository = new MessageDatabaseRepository(dbUrl, user, password);
+        Repository<Invite> inviteRepository = new InviteDatabaseRepository(dbUrl, user, password);
         service = new SocialNetworkService(userRepository, friendshipRepository, messageRepository, inviteRepository);
     }
 

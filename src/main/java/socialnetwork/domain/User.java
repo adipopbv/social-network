@@ -1,21 +1,20 @@
 package socialnetwork.domain;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Vector;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class User extends Entity {
     private String firstName;
     private String lastName;
-    private final List<Long> friends;
+    private List<User> friends;
 
     public User(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
-        friends = new Vector<>();
+        friends = new ArrayList<>();
     }
 
-    public User(String firstName, String lastName, List<Long> friends) {
+    public User(String firstName, String lastName, List<User> friends) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.friends = friends;
@@ -37,8 +36,16 @@ public class User extends Entity {
         this.lastName = lastName;
     }
 
-    public List<Long> getFriends() {
+    public List<User> getFriends() {
         return friends;
+    }
+
+    public List<Id> getFriendsIds() {
+        return friends.stream().map(Entity::getId).collect(Collectors.toList());
+    }
+
+    public void setFriends(List<User> friends) {
+        this.friends = friends;
     }
 
     @Override
@@ -47,7 +54,7 @@ public class User extends Entity {
                 "id='" + getId() + '\'' +
                 ", firstName='" + getFirstName() + '\'' +
                 ", lastName='" + getLastName() + '\'' +
-                ", friends=" + getFriends() +
+                ", friends=" + getFriendsIds() +
                 '}';
     }
 
@@ -58,11 +65,11 @@ public class User extends Entity {
         User that = (User) o;
         return getFirstName().equals(that.getFirstName()) &&
                 getLastName().equals(that.getLastName()) &&
-                getFriends().equals(that.getFriends());
+                getFriendsIds().equals(that.getFriendsIds());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getFirstName(), getLastName(), getFriends());
+        return Objects.hash(getFirstName(), getLastName(), getFriendsIds());
     }
 }
