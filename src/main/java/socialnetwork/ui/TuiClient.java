@@ -1,8 +1,6 @@
 package socialnetwork.ui;
 
-import socialnetwork.domain.Invite;
-import socialnetwork.domain.Message;
-import socialnetwork.domain.User;
+import socialnetwork.domain.*;
 import socialnetwork.domain.exceptions.SocialNetworkException;
 import socialnetwork.domain.exceptions.ValidationException;
 import socialnetwork.service.SocialNetworkService;
@@ -153,7 +151,7 @@ public class TuiClient implements SocialNetworkClient {
         System.out.print("User id: ");
         String id = scanner.nextLine();
 
-        service.removeUser(Long.parseLong(id));
+        service.removeUser(new Id(id));
     }
 
     private void sendInvite() {
@@ -162,26 +160,26 @@ public class TuiClient implements SocialNetworkClient {
         System.out.print("Send to id: ");
         String toId = scanner.nextLine();
         try {
-            Long.parseLong(fromId);
-            Long.parseLong(toId);
+            Integer.parseInt(fromId);
+            Integer.parseInt(toId);
         } catch (Exception e) {
             throw new ValidationException("invalid ids");
         }
 
-        service.sendInvite(Long.parseLong(fromId), Long.parseLong(toId));
+        service.sendInvite(new Id(fromId), new Id(toId));
     }
 
     private void getInvites() {
         System.out.print("User id: ");
         String id = scanner.nextLine();
         try {
-            Long.parseLong(id);
+            Integer.parseInt(id);
         } catch (Exception e) {
             throw new ValidationException("invalid id");
         }
 
-        Iterable<Invite> invites = service.getInvites(Long.parseLong(id));
-        invites.forEach(invite -> System.out.println("Invite " + invite.getId() + " from " + invite.getFrom() + " to " + invite.getTo() + ". Status: " + invite.getStatus()));
+        Iterable<Invite> invites = service.getInvites(new Id(id));
+        invites.forEach(invite -> System.out.println("Invite " + invite.getId() + " from " + invite.getFromId() + " to " + invite.getToId() + ". Status: " + invite.getStatus()));
     }
 
     private void acceptInvite() {
@@ -190,13 +188,13 @@ public class TuiClient implements SocialNetworkClient {
         System.out.print("Invite id: ");
         String inviteId = scanner.nextLine();
         try {
-            Long.parseLong(userId);
-            Long.parseLong(inviteId);
+            Integer.parseInt(userId);
+            Integer.parseInt(inviteId);
         } catch (Exception e) {
             throw new ValidationException("invalid ids");
         }
 
-        service.acceptInvite(Long.parseLong(userId), Long.parseLong(inviteId));
+        service.acceptInvite(new Id(userId), new Id(inviteId));
     }
 
     private void rejectInvite() {
@@ -205,13 +203,13 @@ public class TuiClient implements SocialNetworkClient {
         System.out.print("Invite id: ");
         String inviteId = scanner.nextLine();
         try {
-            Long.parseLong(userId);
-            Long.parseLong(inviteId);
+            Integer.parseInt(userId);
+            Integer.parseInt(inviteId);
         } catch (Exception e) {
             throw new ValidationException("invalid ids");
         }
 
-        service.rejectInvite(Long.parseLong(userId), Long.parseLong(inviteId));
+        service.rejectInvite(new Id(userId), new Id(inviteId));
     }
 
     private void removeFriendship() {
@@ -220,14 +218,14 @@ public class TuiClient implements SocialNetworkClient {
         System.out.print("Friendship id: ");
         String friendshipId = scanner.nextLine();
         try {
-            Long.parseLong(userId);
-            Long.parseLong(friendshipId);
+            Integer.parseInt(userId);
+            Integer.parseInt(friendshipId);
         } catch (Exception e) {
             userId = "-1";
             friendshipId = "-1";
         }
 
-        service.removeFriendship(Long.parseLong(userId), Long.parseLong(friendshipId));
+        service.removeFriendship(new Id(userId), new Id(friendshipId));
     }
 
     private void getCommunitiesCount() {
@@ -242,12 +240,12 @@ public class TuiClient implements SocialNetworkClient {
         System.out.print("User id: ");
         String id = scanner.nextLine();
         try {
-            Long.parseLong(id);
+            Integer.parseInt(id);
         } catch (Exception e) {
             throw new ValidationException("invalid user id");
         }
 
-        Map<User, LocalDateTime> friends = service.getUserFriendships(Long.parseLong(id));
+        Map<User, LocalDateTime> friends = service.getUserFriendships(new Id(id));
         for (User user : friends.keySet()) {
             System.out.println(user.getLastName() + "|" + user.getFirstName() + "|" + friends.get(user));
         }
@@ -259,13 +257,13 @@ public class TuiClient implements SocialNetworkClient {
         System.out.print("Month of friendship: ");
         String month = scanner.nextLine();
         try {
-            Long.parseLong(id);
+            Integer.parseInt(id);
             Integer.parseInt(month);
         } catch (Exception e) {
             throw new ValidationException("invalid data");
         }
 
-        Map<User, LocalDateTime> friends = service.getUserFriendshipsInMonth(Long.parseLong(id), Integer.parseInt(month));
+        Map<User, LocalDateTime> friends = service.getUserFriendshipsInMonth(new Id(id), Integer.parseInt(month));
         for (User user : friends.keySet()) {
             System.out.println(user.getLastName() + "|" + user.getFirstName() + "|" + friends.get(user));
         }
@@ -280,26 +278,26 @@ public class TuiClient implements SocialNetworkClient {
         System.out.print("Message: ");
         String message = scanner.nextLine();
         try {
-            Long.parseLong(id);
-            to = Arrays.stream(toStr.split(",")).map(Long::parseLong).collect(Collectors.toCollection(Vector::new));
+            Integer.parseInt(id);
+            to = Arrays.stream(toStr.split(",")).map(Long::parseLong).collect(Collectors.toList());
         } catch (Exception e) {
             throw new ValidationException("invalid data");
         }
 
-        service.sendMessage(Long.parseLong(id), to, message);
+//        service.sendMessage(new Id(id), to, message);
     }
 
     private void listConversations() {
         System.out.print("User id: ");
         String id = scanner.nextLine();
         try {
-            Long.parseLong(id);
+            Integer.parseInt(id);
         } catch (Exception e) {
             throw new ValidationException("invalid id");
         }
 
-        Iterable<Message> conversations = service.getConversations(Long.parseLong(id));
-        conversations.forEach(conversation -> System.out.println("Conversation " + conversation.getId() + ": " + conversation.getMessage() + " | ..."));
+        Iterable<Conversation> conversations = service.getConversations(new Id(id));
+        conversations.forEach(System.out::println);
     }
 
     private void viewConversation() {
@@ -308,14 +306,14 @@ public class TuiClient implements SocialNetworkClient {
         System.out.print("Conversation id: ");
         String conversationId = scanner.nextLine();
         try {
-            Long.parseLong(userId);
-            Long.parseLong(conversationId);
+            Integer.parseInt(userId);
+            Integer.parseInt(conversationId);
         } catch (Exception e) {
             throw new ValidationException("invalid data");
         }
 
-        Iterable<Message> messages = service.getConversation(Long.parseLong(userId), Long.parseLong(conversationId));
-        messages.forEach(message -> System.out.println("User " + message.getFrom() + " (id: " + message.getId() + ") : " + message.getMessage()));
+        Iterable<Message> messages = service.getConversationMessages(new Id(conversationId));
+        messages.forEach(message -> System.out.println("User " + message.getFromId() + " (id: " + message.getId() + ") : " + message.getText()));
     }
 
     private void replyToMessage() {
@@ -326,12 +324,12 @@ public class TuiClient implements SocialNetworkClient {
         System.out.print("Message: ");
         String messageValue = scanner.nextLine();
         try {
-            Long.parseLong(id);
-            Long.parseLong(replyToId);
+            Integer.parseInt(id);
+            Integer.parseInt(replyToId);
         } catch (Exception e) {
             throw new ValidationException("invalid data");
         }
 
-        service.replyToMessage(Long.parseLong(id), Long.parseLong(replyToId), messageValue);
+//        service.sendReply(Integer.parseInt(id), Integer.parseInt(replyToId), messageValue);
     }
 }

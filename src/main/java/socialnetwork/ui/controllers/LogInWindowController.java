@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import socialnetwork.domain.Id;
 import socialnetwork.domain.User;
 
 public class LogInWindowController extends AbstractWindowController {
@@ -21,8 +22,7 @@ public class LogInWindowController extends AbstractWindowController {
 
     public void logIn() {
         try {
-            String userIdStr = logInUserIdField.getText();
-            long userId = Long.parseLong(userIdStr);
+            Id userId = new Id(logInUserIdField.getText());
             User user = service.logInUser(userId);
 
             FXMLLoader loader = new FXMLLoader();

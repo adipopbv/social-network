@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="482.0" prefWidth="396.0" style="-fx-background-color: grey;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="socialnetwork.ui.controllers.AllUsersWindowController">
+<AnchorPane prefHeight="482.0" prefWidth="396.0" style="-fx-background-color: grey;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="socialnetwork.ui.controllers.AllUsersInviteWindowController">
    <children>
       <Text fill="WHITE" layoutX="35.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="All users" textAlignment="CENTER" wrappingWidth="326.4240036010742" AnchorPane.bottomAnchor="444.242000579834" AnchorPane.leftAnchor="35.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="13.757999420166016">
          <font>

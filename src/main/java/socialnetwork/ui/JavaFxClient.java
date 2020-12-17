@@ -5,29 +5,24 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import socialnetwork.domain.Friendship;
-import socialnetwork.domain.Invite;
-import socialnetwork.domain.Message;
-import socialnetwork.domain.User;
+import socialnetwork.domain.*;
 import socialnetwork.repository.Repository;
-import socialnetwork.repository.database.FriendshipDatabaseRepository;
-import socialnetwork.repository.database.InviteDatabaseRepository;
-import socialnetwork.repository.database.MessageDatabaseRepository;
-import socialnetwork.repository.database.UserDatabaseRepository;
+import socialnetwork.repository.database.*;
 import socialnetwork.service.SocialNetworkService;
 import socialnetwork.ui.controllers.LogInWindowController;
 
-public class JavaFxClient extends Application implements SocialNetworkClient{
+public class JavaFxClient extends Application implements SocialNetworkClient {
     final SocialNetworkService service;
 
     public JavaFxClient() {
         String dbUrl = "jdbc:postgresql://localhost:5432/socialnetwork";
         String user = "adipopbv", password = "adipopbv";
-        Repository<Long, User> userRepository = new UserDatabaseRepository(dbUrl, user, password);
-        Repository<Long, Friendship> friendshipRepository = new FriendshipDatabaseRepository(dbUrl, user, password);
-        Repository<Long, Message> messageRepository = new MessageDatabaseRepository(dbUrl, user, password);
-        Repository<Long, Invite> inviteRepository = new InviteDatabaseRepository(dbUrl, user, password);
-        service = new SocialNetworkService(userRepository, friendshipRepository, messageRepository, inviteRepository);
+        Repository<User> userRepository = new UserDatabaseRepository(dbUrl, user, password);
+        Repository<Friendship> friendshipRepository = new FriendshipDatabaseRepository(dbUrl, user, password, userRepository);
+        Repository<Message> messageRepository = new MessageDatabaseRepository(dbUrl, user, password, userRepository);
+        Repository<Invite> inviteRepository = new InviteDatabaseRepository(dbUrl, user, password, userRepository);
+        Repository<Conversation> conversationRepository = new ConversationDatabaseRepository(dbUrl, user, password, userRepository, messageRepository);
+        service = new SocialNetworkService(userRepository, friendshipRepository, messageRepository, inviteRepository, conversationRepository);
     }
 
     @Override
@@ -49,7 +44,7 @@ public class JavaFxClient extends Application implements SocialNetworkClient{
         main(args);
     }
 
-   public static void main(String[] args) {
+    public static void main(String[] args) {
         launch(args);
     }
 }

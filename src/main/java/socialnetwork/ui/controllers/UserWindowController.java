@@ -2,7 +2,6 @@ package socialnetwork.ui.controllers;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -13,8 +12,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import socialnetwork.domain.User;
 import socialnetwork.service.SocialNetworkService;
-
-import java.util.stream.Collectors;
 
 public class UserWindowController extends AbstractWindowController {
     ObservableList<User> userFriends = FXCollections.observableArrayList();
@@ -35,6 +32,8 @@ public class UserWindowController extends AbstractWindowController {
     public Button removeFriendButton;
     @FXML
     public Button listInvitesButton;
+    @FXML
+    public Button listMessagesButton;
 
     @FXML
     public void initialize() {
@@ -54,13 +53,13 @@ public class UserWindowController extends AbstractWindowController {
         ((Stage) logOutUserButton.getScene().getWindow()).close();
     }
 
-    public void openAllUsersWindow() {
+    public void openAllUsersInviteWindow() {
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("/view/allUsersWindow.fxml"));
+            loader.setLocation(getClass().getResource("/view/allUsersInviteWindow.fxml"));
             AnchorPane root = loader.load();
 
-            AllUsersWindowController controller = loader.getController();
+            AllUsersInviteWindowController controller = loader.getController();
             controller.init(service, loggedUser);
 
             Stage stage = new Stage();
@@ -100,8 +99,28 @@ public class UserWindowController extends AbstractWindowController {
         }
     }
 
+    public void openMessagesWindow() {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/view/messagesWindow.fxml"));
+            AnchorPane root = loader.load();
+
+            MessagesWindowController controller = loader.getController();
+            controller.init(service, loggedUser);
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root, 635, 468));
+            stage.setTitle("User messaging");
+            stage.show();
+
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
+            alert.show();
+        }
+    }
+
     @Override
     public void update() {
-        userFriends.setAll(service.getFriends(loggedUser.getId()));
+        userFriends.setAll(loggedUser.getFriends());
     }
 }

@@ -19,8 +19,10 @@
           <TableColumn fx:id="lastNameColumn" prefWidth="139.0" text="Last name" />
         </columns>
       </TableView>
-      <Button fx:id="listAllUsersButton" layoutX="329.0" layoutY="79.0" mnemonicParsing="false" onAction="#openAllUsersWindow" prefHeight="26.0" prefWidth="107.0" text="List all users" AnchorPane.leftAnchor="329.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="79.0" />
+      <Button fx:id="listAllUsersButton" layoutX="329.0" layoutY="79.0" mnemonicParsing="false" onAction="#openAllUsersInviteWindow" prefHeight="26.0" prefWidth="107.0" text="List all users" AnchorPane.leftAnchor="329.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="79.0" />
       <Button fx:id="removeFriendButton" layoutX="329.0" layoutY="127.0" mnemonicParsing="false" onAction="#removeFriend" prefHeight="48.0" prefWidth="107.0" text="Remove friend" textAlignment="CENTER" wrapText="true" AnchorPane.leftAnchor="329.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="127.0" />
       <Button fx:id="listInvitesButton" layoutX="329.0" layoutY="197.0" mnemonicParsing="false" onAction="#openInvitesWindow" prefHeight="26.0" prefWidth="107.0" text="See invites" textAlignment="CENTER" AnchorPane.leftAnchor="329.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="197.0" />
+      <Separator layoutX="329.0" layoutY="247.0" prefHeight="3.0" prefWidth="107.0" AnchorPane.leftAnchor="329.0" AnchorPane.rightAnchor="35.0" />
+      <Button fx:id="listMessagesButton" layoutX="329.0" layoutY="272.0" mnemonicParsing="false" onAction="#openMessagesWindow" prefHeight="48.0" prefWidth="107.0" text="See messages" textAlignment="CENTER" wrapText="true" AnchorPane.leftAnchor="329.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="272.0" />
     </children>
 </AnchorPane>

@@ -3,81 +3,101 @@ package socialnetwork.domain;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
-public class Message extends Entity<Long> {
-    private final Long from;
-    private final List<Long> to;
-    private final String message;
+public class Message extends Entity {
+    private final User from;
+    private final List<User> to;
+    private final String text;
     private final LocalDateTime date;
-    private long response;
-    private boolean isReply = true;
+    private Message original;
+    private Message response;
 
-    public Message(Long from, List<Long> to, String message) {
+    public Message(User from, List<User> to, String text) {
         this.from = from;
         this.to = to;
-        this.message = message;
+        this.text = text;
         this.date = LocalDateTime.now();
-        this.response = 0;
+        this.response = null;
+        this.original = null;
     }
 
-    public Message(Long from, List<Long> to, String message, Long response) {
+    public Message(User from, List<User> to, String text, LocalDateTime date) {
         this.from = from;
         this.to = to;
-        this.message = message;
-        this.date = LocalDateTime.now();
-        this.response = response;
-    }
-
-    public Message(Long from, List<Long> to, String message, LocalDateTime date, Long response, Boolean isReply) {
-        this.from = from;
-        this.to = to;
-        this.message = message;
+        this.text = text;
         this.date = date;
-        this.response = response;
-        this.isReply = isReply;
+        this.response = null;
+        this.original = null;
     }
 
-    public Long getFrom() {
+    public Message(User from, List<User> to, String text, LocalDateTime date, Message original, Message response) {
+        this.from = from;
+        this.to = to;
+        this.text = text;
+        this.date = date;
+        this.original = original;
+        this.response = response;
+    }
+
+    public User getFrom() {
         return from;
     }
 
-    public List<Long> getTo() {
+    public Id getFromId() {
+        return getFrom().getId();
+    }
+
+    public List<User> getTo() {
         return to;
     }
 
-    public String getMessage() {
-        return message;
+    public List<Id> getToIds() {
+        return to.stream().map(Entity::getId).collect(Collectors.toList());
+    }
+
+    public String getText() {
+        return text;
     }
 
     public LocalDateTime getDate() {
         return date;
     }
 
-    public Long getResponse() {
+    public Message getOriginal() {
+        return original;
+    }
+
+    public void setOriginal(Message original) {
+        this.original = original;
+    }
+
+    public Id getOriginalId() {
+        return original.getId();
+    }
+
+    public Message getResponse() {
         return response;
     }
 
-    public void setResponse(long response) {
+    public void setResponse(Message response) {
         this.response = response;
     }
 
-    public boolean isReply() {
-        return isReply;
-    }
-
-    public void setReply(boolean reply) {
-        isReply = reply;
+    public Id getResponseId() {
+        return getResponse().getId();
     }
 
     @Override
     public String toString() {
         return "Message{" +
                 "\n id = " + getId() +
-                ",\n from = " + getFrom() +
-                ",\n to = " + getTo() +
-                ",\n message = '" + getMessage() + '\'' +
+                ",\n from = " + getFromId() +
+                ",\n to = " + getToIds() +
+                ",\n text = '" + getText() + '\'' +
                 ",\n date = " + getDate() +
-                ",\n response = " + ((response == 0) ? "none" : response) +
+                ",\n original = " + getOriginalId() +
+                ",\n response = " + getResponseId() +
                 "\n}";
     }
 
@@ -86,15 +106,16 @@ public class Message extends Entity<Long> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Message message1 = (Message) o;
-        return getFrom().equals(message1.getFrom()) &&
-                getTo().equals(message1.getTo()) &&
-                getMessage().equals(message1.getMessage()) &&
+        return getFromId().equals(message1.getFromId()) &&
+                getToIds().equals(message1.getToIds()) &&
+                getText().equals(message1.getText()) &&
                 getDate().equals(message1.getDate()) &&
-                getResponse().equals(message1.getResponse());
+                getOriginalId().equals(message1.getOriginalId()) &&
+                getResponseId().equals(message1.getResponseId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getFrom(), getTo(), getMessage(), getDate(), getMessage(), getResponse());
+        return Objects.hash(getFromId(), getToIds(), getText(), getDate(), getOriginalId(), getResponseId());
     }
 }

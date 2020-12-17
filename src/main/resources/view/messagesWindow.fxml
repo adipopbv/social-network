@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="468.0" prefWidth="635.0" style="-fx-background-color: grey;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="socialnetwork.ui.controllers.MessagesWindowController">
+    <children>
+        <Text fill="WHITE" layoutX="35.0" layoutY="-5.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Messaging" textAlignment="CENTER" wrappingWidth="565.0" AnchorPane.leftAnchor="35.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="14.0">
+            <font>
+                <Font name="Noto Sans Regular" size="18.0" />
+            </font>
+        </Text>
+        <Separator layoutX="35.0" layoutY="55.0" prefWidth="200.0" AnchorPane.leftAnchor="35.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="55.0" />
+        <TableView fx:id="conversationsTableView" layoutX="35.0" layoutY="83.0" prefHeight="334.0" prefWidth="273.0">
+            <columns>
+                <TableColumn fx:id="participantsColumn" prefWidth="272.0" text="Conversations" />
+            </columns>
+        </TableView>
+      <Button fx:id="newConversationButton" layoutX="99.0" layoutY="428.0" mnemonicParsing="false" onAction="#openAllUsersMessageWindow" prefHeight="26.0" prefWidth="146.0" text="New conversation" wrapText="true" />
+      <TextField fx:id="messageTextField" layoutX="333.0" layoutY="391.0" prefHeight="26.0" prefWidth="267.0" promptText="message" AnchorPane.leftAnchor="333.0" AnchorPane.rightAnchor="35.0" />
+      <Button fx:id="sendMessageButton" layoutX="394.0" layoutY="428.0" mnemonicParsing="false" onAction="#sendMessage" prefHeight="26.0" prefWidth="146.0" text="Send" textAlignment="CENTER" />
+      <ScrollPane fx:id="chatContainer" hbarPolicy="NEVER" layoutX="333.0" layoutY="83.0" prefHeight="287.0" prefWidth="267.0" vbarPolicy="ALWAYS">
+         <content>
+            <VBox fx:id="chatBox" prefHeight="285.0" prefWidth="250.0" />
+         </content>
+      </ScrollPane>
+    </children>
+</AnchorPane>

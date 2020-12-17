@@ -3,29 +3,37 @@ package socialnetwork.domain;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class Friendship extends Entity<Long> {
-    protected final LocalDateTime date;
-    protected final long id1;
-    protected final long id2;
+public class Friendship extends Entity {
+    private final LocalDateTime date;
+    private final User firstFriend;
+    private final User secondFriend;
 
-    public Friendship(long id1, long id2) {
+    public Friendship(User firstFriend, User secondFriend) {
         date = LocalDateTime.now();
-        this.id1 = id1;
-        this.id2 = id2;
+        this.firstFriend = firstFriend;
+        this.secondFriend = secondFriend;
     }
 
-    public Friendship(LocalDateTime date, long id1, long id2) {
+    public Friendship(LocalDateTime date, User firstFriend, User secondFriend) {
         this.date = date;
-        this.id1 = id1;
-        this.id2 = id2;
+        this.firstFriend = firstFriend;
+        this.secondFriend = secondFriend;
     }
 
-    public long getFriend1() {
-        return id1;
+    public User getFirstFriend() {
+        return firstFriend;
     }
 
-    public long getFriend2() {
-        return id2;
+    public Id getFirstFriendId() {
+        return getFirstFriend().getId();
+    }
+
+    public User getSecondFriend() {
+        return secondFriend;
+    }
+
+    public Id getSecondFriendId() {
+        return getSecondFriend().getId();
     }
 
     public LocalDateTime getDate() {
@@ -37,8 +45,8 @@ public class Friendship extends Entity<Long> {
         return "Friend{" +
                 "id='" + getId() + '\'' +
                 ", date='" + getDate() + '\'' +
-                ", friend1='" + getFriend1() + '\'' +
-                ", friend2='" + getFriend2() + '\'' +
+                ", firstFriend='" + getFirstFriendId() + '\'' +
+                ", secondFriend='" + getSecondFriendId() + '\'' +
                 '}';
     }
 
@@ -48,12 +56,12 @@ public class Friendship extends Entity<Long> {
         if (!(o instanceof Friendship)) return false;
         Friendship that = (Friendship) o;
         return getDate().equals(that.getDate()) &&
-                getFriend1() == that.getFriend1() &&
-                getFriend2() == that.getFriend2();
+                getFirstFriendId() == that.getFirstFriendId() &&
+                getSecondFriendId() == that.getSecondFriendId();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getDate(), getFriend1(), getFriend2());
+        return Objects.hash(getDate(), getFirstFriendId(), getSecondFriendId());
     }
 }
