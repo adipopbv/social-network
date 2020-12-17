@@ -2,6 +2,7 @@ package socialnetwork.ui.controllers;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -45,6 +46,8 @@ public class InvitesWindowController extends AbstractWindowController {
     public Button acceptInviteButton;
     @FXML
     public Button rejectInviteButton;
+    @FXML
+    public Button cancelInviteButton;
 
     @FXML
     public void initialize() {
@@ -101,8 +104,17 @@ public class InvitesWindowController extends AbstractWindowController {
                 service.rejectInvite(loggedUser.getId(), fromUsersTableView.getSelectionModel().getSelectedItem().getInvite().getId());
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, "Operation successful!");
                 alert.show();
-            } else if (toUsersTableView.getSelectionModel().getSelectedItem() != null) {
-                service.rejectInvite(loggedUser.getId(), toUsersTableView.getSelectionModel().getSelectedItem().getInvite().getId());
+            }
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
+            alert.show();
+        }
+    }
+
+    public void cancelInvite() {
+        try {
+            if (toUsersTableView.getSelectionModel().getSelectedItem() != null) {
+                service.cancelInvite(loggedUser.getId(), toUsersTableView.getSelectionModel().getSelectedItem().getInvite().getId());
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, "Operation successful!");
                 alert.show();
             }

@@ -20,7 +20,7 @@
             <TableColumn fx:id="dateColumn" prefWidth="154.0" text="Date" />
             </columns>
         </TableView>
-        <Button fx:id="acceptInviteButton" layoutX="35.0" layoutY="522.0" mnemonicParsing="false" onAction="#acceptInvite" prefHeight="26.0" prefWidth="214.0" text="Accept" textAlignment="CENTER" AnchorPane.leftAnchor="35.0" AnchorPane.rightAnchor="343.0" />
+        <Button fx:id="acceptInviteButton" layoutX="35.0" layoutY="522.0" mnemonicParsing="false" onAction="#acceptInvite" prefHeight="26.0" prefWidth="160.0" text="Accept" textAlignment="CENTER" AnchorPane.leftAnchor="35.0" AnchorPane.rightAnchor="397.0" />
       <TableView fx:id="fromUsersTableView" layoutX="35.0" layoutY="316.0" prefHeight="197.0" prefWidth="522.0">
          <columns>
             <TableColumn fx:id="firstNameColumn1" prefWidth="120.0" text="First name" />
@@ -39,6 +39,7 @@
             <Font name="Noto Sans Regular" size="18.0" />
          </font>
       </Text>
-      <Button fx:id="rejectInviteButton" layoutX="343.0" layoutY="522.0" mnemonicParsing="false" onAction="#rejectInvite" prefHeight="26.0" prefWidth="214.0" text="Reject" textAlignment="CENTER" AnchorPane.leftAnchor="343.0" AnchorPane.rightAnchor="35.0" />
+      <Button fx:id="rejectInviteButton" layoutX="397.0" layoutY="522.0" mnemonicParsing="false" onAction="#rejectInvite" prefHeight="26.0" prefWidth="160.0" text="Reject" textAlignment="CENTER" AnchorPane.leftAnchor="397.0" AnchorPane.rightAnchor="35.0" />
+      <Button fx:id="cancelInviteButton" layoutX="216.0" layoutY="522.0" mnemonicParsing="false" onAction="#cancelInvite" prefHeight="26.0" prefWidth="160.0" text="Cancel" textAlignment="CENTER" />
     </children>
 </AnchorPane>

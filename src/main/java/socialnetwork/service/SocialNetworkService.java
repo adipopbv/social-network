@@ -505,6 +505,30 @@ public class SocialNetworkService implements Observable {
     }
 
     /**
+     * Cancels a invite
+     * @param userId the id of the user rejecting the invite
+     * @param inviteId the id of the invite being rejected
+     * @return the invite after being rejected if the operation was successful
+     */
+    public Invite cancelInvite(Id userId, Id inviteId) {
+        User user = userRepository.findOne(userId);
+        Invite invite = inviteRepository.findOne(inviteId);
+        if (userRepository.findOne(user.getId()) == null)
+            throw new NotFoundException("nonexistent user");
+        if (inviteRepository.findOne(invite.getId()) == null ||
+                (invite.getFrom() != user &&
+                        invite.getTo() != user) ||
+                invite.getStatus() != InviteStatus.PENDING)
+            throw new ValidationException("invalid invite");
+
+        invite.setStatus(InviteStatus.CANCELLED);
+        inviteRepository.delete(invite.getId());
+
+        notifyObservers();
+        return invite;
+    }
+
+    /**
      * Removes a friend
      * @param userId the id of the user removing the friend
      * @param friendId the id of the friend being removed
