@@ -16,6 +16,7 @@ public class FriendshipDatabaseRepository extends AbstractDatabaseRepository<Fri
     public FriendshipDatabaseRepository(String url, String user, String password, Repository<User> userRepository) {
         super(url, user, password);
         this.userRepository = userRepository;
+        loadData();
     }
 
     @Override

@@ -2,12 +2,12 @@ package socialnetwork.ui.controllers;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import socialnetwork.domain.Entity;
+import socialnetwork.domain.Id;
 import socialnetwork.domain.User;
 import socialnetwork.service.SocialNetworkService;
 
@@ -24,7 +24,7 @@ public class AllUsersMessageWindowController extends AbstractWindowController {
     @FXML
     public TableColumn<User, String> lastNameColumn;
     @FXML
-    public Button sendMessageButton;
+    public Button newConversationButton;
     @FXML
     public TextField messageTextField;
 
@@ -41,17 +41,17 @@ public class AllUsersMessageWindowController extends AbstractWindowController {
         super.init(service, loggedUser);
     }
 
-    public void sendMessage() {
+    public void newConversation() {
         try {
             if (usersTableView.getSelectionModel().getSelectedItems() != null) {
-                List<Long> usersIds = usersTableView.getSelectionModel().getSelectedItems().stream().map(Entity::getId).collect(Collectors.toList());
-                service.sendMessage(loggedUser.getId(), usersIds, messageTextField.getText());
+                List<Id> usersIds = usersTableView.getSelectionModel().getSelectedItems().stream().map(Entity::getId).collect(Collectors.toList());
+                service.addConversation(loggedUser.getId(), usersIds, messageTextField.getText());
             }
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
             alert.show();
         }
-        ((Stage) sendMessageButton.getScene().getWindow()).close();
+        ((Stage) newConversationButton.getScene().getWindow()).close();
     }
 
     @Override

@@ -21,6 +21,7 @@ public class ConversationDatabaseRepository extends AbstractDatabaseRepository<C
         super(dbUrl, user, password);
         this.userRepository = userRepository;
         this.messageRepository = messageRepository;
+        loadData();
     }
 
     @Override

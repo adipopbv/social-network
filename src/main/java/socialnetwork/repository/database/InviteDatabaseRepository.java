@@ -17,6 +17,7 @@ public class InviteDatabaseRepository extends AbstractDatabaseRepository<Invite>
     public InviteDatabaseRepository(String url, String user, String password, Repository<User> userRepository) {
         super(url, user, password);
         this.userRepository = userRepository;
+        loadData();
     }
 
     @Override

@@ -320,6 +320,38 @@ public class SocialNetworkService implements Observable {
     }
 
     /**
+     * Creates a new conversation
+     * @param fromId the id of the user sending the first message of the conversation
+     * @param toIds the ids of the users receiving the message
+     * @param text the message body
+     * @return the newly created conversation if operation successful
+     */
+    public Conversation addConversation(Id fromId, List<Id> toIds, String text) {
+        User from = userRepository.findOne(fromId);
+        List<User> to = new ArrayList<>();
+        for (Id toId : toIds)
+            to.add(userRepository.findOne(toId));
+        if (from == null || to.isEmpty())
+            throw new NotFoundException("user not found");
+
+        Message message = new Message(from, to, text);
+        messageValidator.validate(message);
+        do {
+            message.setId(new Id());
+        } while (messageRepository.save(message) != null);
+
+        to.add(from);
+        Conversation conversation = new Conversation(to, new ArrayList<>(Collections.singletonList(message)));
+        conversationValidator.validate(conversation);
+        do {
+            conversation.setId(new Id());
+        } while (conversationRepository.save(conversation) != null);
+
+        notifyObservers();
+        return null;
+    }
+
+    /**
      * Adds a message to the repo
      * @param conversationId the id of the conversation
      * @param fromId the id of the user that sends the message
@@ -341,6 +373,7 @@ public class SocialNetworkService implements Observable {
             message.setId(new Id());
         } while (messageRepository.save(message) != null);
         conversation.getMessages().add(message);
+        conversationRepository.update(conversation);
 
         notifyObservers();
         return message;
@@ -370,8 +403,9 @@ public class SocialNetworkService implements Observable {
         do {
             response.setId(new Id());
         } while (messageRepository.save(response) != null);
-        conversation.getMessages().add(response);
         messageRepository.update(original);
+        conversation.getMessages().add(response);
+        conversationRepository.update(conversation);
 
         notifyObservers();
         return response;
@@ -501,6 +535,7 @@ public class SocialNetworkService implements Observable {
         friendshipRepository.close();
         messageRepository.close();
         inviteRepository.close();
+        conversationRepository.close();
     }
 
     @Override

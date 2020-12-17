@@ -68,12 +68,12 @@ public class InvitesWindowController extends AbstractWindowController {
     @Override
     public void update() {
         List<Invite> invites = service.getInvites(loggedUser.getId());
-        List<Invite> receivedInvites = invites.stream().filter(invite -> invite.getTo().equals(loggedUser.getId())).collect(Collectors.toList());
+        List<Invite> receivedInvites = invites.stream().filter(invite -> invite.getTo().equals(loggedUser)).collect(Collectors.toList());
         List<TableInvite> fromUsersList = new ArrayList<>();
         for (Invite invite : receivedInvites) {
             fromUsersList.add(new TableInvite(service.getUser(invite.getFrom().getId()), invite));
         }
-        List<Invite> sentInvites = invites.stream().filter(invite -> invite.getFrom().equals(loggedUser.getId())).collect(Collectors.toList());
+        List<Invite> sentInvites = invites.stream().filter(invite -> invite.getFrom().equals(loggedUser)).collect(Collectors.toList());
         List<TableInvite> toUsersList = new ArrayList<>();
         for (Invite invite : sentInvites) {
             toUsersList.add(new TableInvite(service.getUser(invite.getTo().getId()), invite));

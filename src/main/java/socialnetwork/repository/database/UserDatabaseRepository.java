@@ -12,6 +12,7 @@ import java.util.List;
 public class UserDatabaseRepository extends AbstractDatabaseRepository<User> {
     public UserDatabaseRepository(String url, String user, String password) {
         super(url, user, password);
+        loadData();
     }
 
     @Override

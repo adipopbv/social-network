@@ -25,7 +25,6 @@ public abstract class AbstractDatabaseRepository<E extends Entity> extends Memor
         } catch (Exception exception) {
             throw new DatabaseException("could not connect to database");
         }
-        loadData();
     }
 
     protected void loadData() { }

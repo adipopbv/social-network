@@ -18,6 +18,7 @@ public class MessageDatabaseRepository extends AbstractDatabaseRepository<Messag
     public MessageDatabaseRepository(String url, String user, String password, Repository<User> userRepository) {
         super(url, user, password);
         this.userRepository = userRepository;
+        loadData();
     }
 
     @Override
